@@ -14,7 +14,7 @@ int main(int argc, char* argv[]) {
     spec.freq = SAMPLE_RATE;
     spec.format = AUDIO_S16SYS;
     spec.channels = 1;
-    spec.samples = 4096;
+    spec.samples = 30000; //4096
     spec.callback = NULL;
 
     SDL_AudioDeviceID device = SDL_OpenAudioDevice(NULL, 0, &spec, NULL, 0);
@@ -24,14 +24,22 @@ int main(int argc, char* argv[]) {
 
     for (int i = 0; i < spec.samples; i++) {
         double t = (double)i / (double)spec.freq;
-        double frequency = 440.0;
+        double frequency = 0.1;
         double waveform = std::sin(TWO_PI * frequency * t);
         audioBuffer[i] = AMPLITUDE * waveform;
     }
 
+    // queue audio data to play
     SDL_QueueAudio(device, audioBuffer.data(), audioBuffer.size());
-    SDL_Delay(1000);
+    SDL_QueueAudio(device, audioBuffer.data(), audioBuffer.size());
+    SDL_QueueAudio(device, audioBuffer.data(), audioBuffer.size());
+    SDL_QueueAudio(device, audioBuffer.data(), audioBuffer.size());
+    SDL_QueueAudio(device, audioBuffer.data(), audioBuffer.size());
 
+    // time to delay further action while queue clears
+    SDL_Delay(5000);
+
+    // close device
     SDL_CloseAudioDevice(device);
     SDL_Quit();
 
