@@ -2,6 +2,20 @@
 #include <SDL2/SDL_image.h>
 #include <iostream>
 
+/*
+
+  ~ CS439 Final Project: graphics.cc ~
+
+  This file exists as a reference for how to:
+
+  - open a window
+  - create surfaces/textures
+  - handle events
+  - handle keyboard input
+
+*/
+
+
 SDL_Window* window;
 SDL_Renderer* renderer;
 SDL_Surface*  surface;

@@ -4,6 +4,18 @@
 #include <vector>
 #include <SDL2/SDL.h>
 
+/*
+
+  ~ CS439 Final Project: audio.cc ~
+
+  This file exists as a reference for how to:
+
+  - create audio data
+  - fill an audio buffer with data
+  - queue the buffer for playback
+
+*/
+
 const int SAMPLE_RATE = 44100;
 const int AMPLITUDE = 32767;
 const double TWO_PI = 6.283185307179586476925286766559;

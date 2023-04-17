@@ -2,6 +2,18 @@
 #include <fstream>
 #include <SDL2/SDL.h>
 
+/*
+
+  ~ CS439 Final Project: audio2.cc ~
+
+  This file is a more advanced version of audio.cc.
+  
+  It exists as a reference for how to:
+
+  - play a .wav file
+
+*/
+
 const int BUFFER_SIZE = 4096;
 
 struct AudioData {
