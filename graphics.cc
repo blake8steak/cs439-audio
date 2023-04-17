@@ -2,6 +2,31 @@
 #include <SDL2/SDL_image.h>
 #include <iostream>
 
+SDL_Window* window;
+SDL_Renderer* renderer;
+SDL_Surface*  surface;
+SDL_Texture* texture;
+
+void goToStudio() {
+    surface = IMG_Load("images/studio.png");
+    if (surface == nullptr) {
+        std::cerr << "IMG_Load Error: " << IMG_GetError() << std::endl;
+        SDL_DestroyRenderer(renderer);
+        SDL_DestroyWindow(window);
+        SDL_Quit();
+        return;
+    }
+    texture = SDL_CreateTextureFromSurface(renderer, surface);
+    SDL_FreeSurface(surface);
+    if (texture == nullptr) {
+        std::cerr << "SDL_CreateTextureFromSurface Error: " << SDL_GetError() << std::endl;
+        SDL_DestroyRenderer(renderer);
+        SDL_DestroyWindow(window);
+        SDL_Quit();
+        return;
+    }
+}
+
 int main(int argc, char* argv[]) {
   // Initialize SDL library
   if (SDL_Init(SDL_INIT_VIDEO) != 0) {
@@ -10,13 +35,13 @@ int main(int argc, char* argv[]) {
   }
 
   // Create a window and a renderer for the menu screen
-  SDL_Window* window = SDL_CreateWindow("Bob-FM: The Game", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 800, 600, SDL_WINDOW_SHOWN);
+  window = SDL_CreateWindow("Bob-FM: The Game", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 800, 600, SDL_WINDOW_SHOWN);
   if (window == nullptr) {
     std::cerr << "SDL_CreateWindow Error: " << SDL_GetError() << std::endl;
     SDL_Quit();
     return 1;
   }
-  SDL_Renderer* renderer = SDL_CreateRenderer(window, -1, 0);
+    renderer = SDL_CreateRenderer(window, -1, 0);
   if (renderer == nullptr) {
     std::cerr << "SDL_CreateRenderer Error: " << SDL_GetError() << std::endl;
     SDL_DestroyWindow(window);
@@ -25,7 +50,7 @@ int main(int argc, char* argv[]) {
   }
 
   // Load the menu background image
-  SDL_Surface* surface = IMG_Load("images/title.png");
+  surface = IMG_Load("images/title.png");
   if (surface == nullptr) {
     std::cerr << "IMG_Load Error: " << IMG_GetError() << std::endl;
     SDL_DestroyRenderer(renderer);
@@ -33,7 +58,7 @@ int main(int argc, char* argv[]) {
     SDL_Quit();
     return 1;
   }
-  SDL_Texture* texture = SDL_CreateTextureFromSurface(renderer, surface);
+  texture = SDL_CreateTextureFromSurface(renderer, surface);
   SDL_FreeSurface(surface);
   if (texture == nullptr) {
     std::cerr << "SDL_CreateTextureFromSurface Error: " << SDL_GetError() << std::endl;
@@ -67,7 +92,8 @@ int main(int argc, char* argv[]) {
         case SDL_KEYDOWN:
           switch (event.key.keysym.sym) {
             case SDLK_RETURN:
-              std::cout << "Menu item selected!" << std::endl;
+              std::cout << "Starting game..." << std::endl;
+              goToStudio();
               break;
             default:
               break;
