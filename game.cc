@@ -15,13 +15,27 @@
 
 //  === GAME VARS ===
 bool game_started = false;
-bool in_studio = false;
+bool in_studio = true;
 
-//  === SYS VARS ===
+/*  
+
+    === SYS VARS ===
+
+*/
+
 SDL_Window* window;
 SDL_Renderer* renderer;
 SDL_Surface*  bgSurface;
 SDL_Texture* bgTexture;
+
+const int BUFFER_SIZE = 4096; // audio buffer
+SDL_AudioSpec audioSpec;
+struct AudioData {
+  char* buffer;
+  int length;
+  int position;
+};
+AudioData audioData;
 
 /*
     ==== GAME METHODS ====
@@ -49,6 +63,43 @@ void setBackground(std::string imgName) {
         return;
     }
 }
+void playAudio(std::string audioName) {
+    std::string path = "sounds/" + audioName + ".wav";
+    std::ifstream file(&path[0], std::ios::binary);
+    if (!file.is_open()) {
+        std::cerr << "Failed to open audio file." << std::endl;
+        return;
+    }
+
+    file.seekg(0, std::ios::end);
+    int length = file.tellg();
+    file.seekg(0, std::ios::beg);
+
+    char* audioBuff = new char[length];
+    file.read(audioBuff, length);
+
+    AudioData audio;
+    audio.buffer = audioBuff;
+    audio.length = length;
+    audio.position = 0;
+    audioData = audio;
+
+    audioSpec.userdata = &audio;
+
+    SDL_AudioDeviceID deviceId = SDL_OpenAudioDevice(NULL, 0, &audioSpec, NULL, 0);
+
+    if (deviceId == 0) {
+        std::cerr << "Failed to open audio device: " << SDL_GetError() << std::endl;
+        return;
+    }
+
+    SDL_PauseAudioDevice(deviceId, 0);
+    // Wait for the audio to finish playing
+    while (audio.position < audio.length) {
+        SDL_Delay(100);
+    }
+    SDL_CloseAudioDevice(deviceId);
+}
 
 /*
     ==== SYSTEM METHODS ====
@@ -56,12 +107,42 @@ void setBackground(std::string imgName) {
     with PC hardware.
 */
 
+void audioCallback(void* userdata, Uint8* stream, int len) {
+    AudioData* audio = (AudioData*)userdata;
+
+    if (audio->position == audio->length) {
+        // if all audio has been played, stop
+        SDL_memset(stream, 0, len);
+        return;
+    }
+
+    int remaining = audio->length - audio->position;
+    int available = std::min(remaining, len);
+
+    SDL_memcpy(stream, audio->buffer + audio->position, available);
+    audio->position += available;
+}
+
 int initGame() {
-    // initialize SDL
+    // init SDL video
     if (SDL_Init(SDL_INIT_VIDEO) != 0) {
-        std::cerr << "SDL_Init Error: " << SDL_GetError() << std::endl;
+        std::cerr << "SDL Video Error: " << SDL_GetError() << std::endl;
         return 1;
     }
+
+    // init SDL audio
+    if (SDL_Init(SDL_INIT_AUDIO) < 0) {
+        std::cerr << "SDL Audio Error: " << SDL_GetError() << std::endl;
+        return 1;
+    }
+    SDL_AudioSpec spec;
+    spec.freq = 44100;
+    spec.format = AUDIO_S16;
+    spec.channels = 2;
+    spec.samples = 4096;
+    spec.callback = audioCallback;
+    // spec.userdata = &audio; // set this when audio data is received
+    audioSpec = spec;
 
     // create window/renderer for the game
     window = SDL_CreateWindow("Bob-FM: The Game", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 800, 600, SDL_WINDOW_SHOWN);
@@ -91,6 +172,7 @@ int main(int argc, char* argv[]) {
 
     initGame();
     setBackground("title");
+    playAudio("SEGA");
 
     // set up menu loop
     bool is_running = true;
@@ -116,8 +198,53 @@ int main(int argc, char* argv[]) {
             case SDL_KEYDOWN:
                 switch (event.key.keysym.sym) {
                 case SDLK_RETURN:
-                    std::cout << "Starting game..." << std::endl;
-                    setBackground("studio");
+                    if(!game_started) {
+                        std::cout << "Starting game..." << std::endl;
+                        game_started = true;
+                        setBackground("studio");
+                    }
+                    break;
+                case SDLK_a:
+                    if(in_studio) {
+                        in_studio = false;
+                        std::cout << "change to ads scene..." << std::endl;
+                        setBackground("ads");
+                    }
+                    break;
+                case SDLK_b:
+                    if(in_studio) {
+                        in_studio = false;
+                        std::cout << "change to buy new songs..." << std::endl;
+                        setBackground("buy");
+                    }
+                    break;
+                case SDLK_c:
+                    if(in_studio) {
+                        in_studio = false;
+                        std::cout << "change to check alicefm..." << std::endl;
+                        setBackground("aliceFM");
+                    }
+                    break;
+                case SDLK_e:
+                    if(in_studio) {
+                        in_studio = false;
+                        std::cout << "change to edit setlist..." << std::endl;
+                        setBackground("setlist");
+                    }
+                    break;
+                case SDLK_g:
+                    if(in_studio) {
+                        in_studio = false;
+                        std::cout << "change to see gheith..." << std::endl;
+                        setBackground("gheith0");
+                    }
+                    break;
+                case SDLK_x:
+                    if(!in_studio) {
+                        in_studio = true;
+                        std::cout << "returning to studio..." << std::endl;
+                        setBackground("studio");
+                    }
                     break;
                 default:
                     break;
