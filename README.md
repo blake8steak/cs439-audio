@@ -3,3 +3,6 @@
 
  To recompile audio.cc, enter the following command into a terminal:
 ### g++ audio2.cc -o program2 -lSDL2
+
+To recompile graphics.cc, enter the following command:
+### g++ -o graphics graphics.cc $(pkg-config --cflags --libs sdl2) $(pkg-config --cflags --libs SDL2_image)
