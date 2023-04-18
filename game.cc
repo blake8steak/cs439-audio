@@ -47,25 +47,41 @@ struct SongData {
     std::string filename;
     std::string artist;
     std::string title;
-    AudioData data;
+    //AudioData data;
+    int coolness_score;
+    int royalty_cost;
     int sample_rate; // 44.1kHz or 48kHz
+    int index;
 };
-std::string tracklist[] = {"Drake-Passionfruit", "LMFAO-PartyRockAnthem", "SouljaBoy-CrankThat", "KanyeWest-CantTellMeNothing", "LilWayne-BillGates", "TravisScott-SickoMode"};
+int tracklist[] = {0, 1, 2, 3, 4, 5};
 SongData complete_tracklist[ALL_TRACKS_SIZE];
 
+int now_playing_index = tracklist[0];
 int num_tracks_played = 0;
 int money = 100;
 int exp_money_increment = 15;
 
 
-// labels
-
+/*
+    label stuff
+*/
 TTF_Font *prstartk;
 SDL_Color COLOR_WHITE = {255, 255, 255};
+
 char moneyBuff[100] = "$100";
 SDL_Surface *money_surface;
 SDL_Texture *money_texture;
 SDL_Rect moneyDstRect = {10, 10, 100, 50};
+
+char songTitleBuff[30] = "Title";
+SDL_Surface *song_title_surface;
+SDL_Texture *song_title_texture;
+SDL_Rect songTitleDstRect = {100, 100, 100, 50};
+
+char artistBuff[30] = "Artist Name";
+SDL_Surface *artist_surface;
+SDL_Texture *artist_texture;
+SDL_Rect artistDstRect = {200, 200, 100, 50};
 
 /*
     ==== GAME METHODS ====
@@ -87,12 +103,17 @@ void createSongArray() {
     std::string all_artists[] = {"Psy", "Nicki Minaj", "Nickelback", "Katy Perry", "Travis Scott", "Rihanna", "Taylor Swift", "Soulja Boy", "Sheck Wes", "LMFAO", "Lil Uzi Vert", "Kanye West", "Taylor Swift", "Foo Fighters", "Drake", "Lil Wayne", "Green Day", "Green Day", "Green Day", "Green Day"};
     std::string all_titles[] = { "Gangnam Style", "Super Bass", "Animals", "California Gurls", "Sicko Mode", "Umbrella", "22", "Crank That (Soulja Boy)",  "Mo Bamba", "Party Rock Anthem", "Just Wanna Rock", "Can\'t Tell Me Nothing", "We Are Never Ever...", "Everlong", "Passionfruit", "Bill Gates", "Holiday", "Basket Case", "American Idiot", "Boulevard of Brok..."};
     int all_sample_rates[] = { FOURTY_FOUR, FOURTY_EIGHT, FOURTY_FOUR, FOURTY_EIGHT, FOURTY_EIGHT, FOURTY_EIGHT, FOURTY_FOUR, FOURTY_EIGHT, FOURTY_EIGHT, FOURTY_FOUR, FOURTY_FOUR, FOURTY_EIGHT, FOURTY_EIGHT, FOURTY_FOUR, FOURTY_FOUR, FOURTY_EIGHT, FOURTY_EIGHT, FOURTY_FOUR, FOURTY_EIGHT, FOURTY_EIGHT};
+    int all_coolness_scores[] = { 2, 12, 9, 8, 5, 14, 22, 1, 6, 2, 7, 8, 21, 24, 10, 10, 21, 26, 29, 21}; //cool
+    int all_royalty_costs[] = { 1, 15, 4, 7, 3, 8, 22, 1, 3, 1, 3, 8, 14, 10, 5, 4, 12, 9, 30, 22 }; //royalty
     // create all SongData objects here
     for(int i=0; i<ALL_TRACKS_SIZE; i++) {
         complete_tracklist[i].filename = all_tracks[i];
         complete_tracklist[i].artist = all_artists[i];
         complete_tracklist[i].title = all_titles[i];
         complete_tracklist[i].sample_rate = all_sample_rates[i];
+        complete_tracklist[i].coolness_score = all_coolness_scores[i];
+        complete_tracklist[i].royalty_cost = all_royalty_costs[i];
+        complete_tracklist[i].index = i;
     }
 }
 
@@ -118,17 +139,58 @@ void setBackground(std::string imgName) {
     }
 }
 
+void hideSongLabels() {
+    SDL_FreeSurface(song_title_surface);
+    SDL_DestroyTexture(song_title_texture);
+    SDL_FreeSurface(artist_surface);
+    SDL_DestroyTexture(artist_texture);
+}
+
 void hideMoneyLabel() {
     SDL_FreeSurface(money_surface);
     SDL_DestroyTexture(money_texture);
 }
 
 void genNewMoneyLabel() {
+    for(int i=0; i<100; i++) {
+        moneyBuff[i] = 0;
+    }
+    std::string monStr = "$"+std::to_string(money);
+    for(int i=0; i<monStr.length(); i++) {
+        moneyBuff[i] = monStr[i];
+    }
     money_surface = TTF_RenderText_Solid(prstartk, moneyBuff, COLOR_WHITE);
     money_texture = SDL_CreateTextureFromSurface(renderer, money_surface);
 }
 
-void playAudio(std::string audioName, int sampleRate) {
+void genNewSongLabels(std::string title, std::string artist) {
+    for(int i=0; i<30; i++) {
+        songTitleBuff[i] = 0;
+        artistBuff[i] = 0;
+    }
+    for(int i=0; i<title.length(); i++) {
+        songTitleBuff[i] = title[i];
+    }
+    for(int i=0; i<title.length(); i++) {
+        artistBuff[i] = artist[i];
+    }
+    artist_surface = TTF_RenderText_Solid(prstartk, artistBuff, COLOR_WHITE);
+    artist_texture = SDL_CreateTextureFromSurface(renderer, artist_surface);
+    song_title_surface = TTF_RenderText_Solid(prstartk, songTitleBuff, COLOR_WHITE);
+    song_title_texture = SDL_CreateTextureFromSurface(renderer, song_title_surface);
+}
+
+void genStudioLabels() {
+    genNewMoneyLabel();
+    genNewSongLabels(complete_tracklist[now_playing_index].title, complete_tracklist[now_playing_index].artist);
+}
+
+void hideStudioLabels() {
+    hideMoneyLabel();
+    hideSongLabels();
+}
+
+void playAudio(std::string audioName, int sampleRate, int royalty_cost) {
     std::string path = "sounds/" + audioName + ".wav";
     std::ifstream file(&path[0], std::ios::binary);
     if (!file.is_open()) {
@@ -169,16 +231,18 @@ void playAudio(std::string audioName, int sampleRate) {
     if(audioName == "static1" || audioName == "static2" || audioName == "static3" || audioName == "shinobi3") {
         return;
     }
+
     num_tracks_played++;
+
+    // decrease money
+    money -= royalty_cost;
+    if(in_studio)
+            genNewMoneyLabel();
+    std::cout << "-------- song played: paying $" << royalty_cost << " in royalties :( $" << money << std::endl;
     std::cout << "incremented num_tracks_played: " << num_tracks_played << std::endl;
     if(num_tracks_played % 2 == 0) {
         money += exp_money_increment;
-        std::cout << "Ad playing: money added! $" << money << std::endl;
-        std::string monStr = "$"+std::to_string(money);
-        for(int i=0; i<monStr.length(); i++) {
-            moneyBuff[i] = monStr[i];
-        }
-        std::cout << "moneyBuff - " << moneyBuff << std::endl;
+        std::cout << "+++++ Ad playing: money added! $" << money << std::endl;
         if(in_studio)
             genNewMoneyLabel();
     }
@@ -265,17 +329,21 @@ int initGame() {
 }
 
 void playAudioWrapper() {
-  playAudio("shinobi3", 44100);
+  playAudio("shinobi3", 44100, 0);
   while(true) {
 
     if(in_studio) {
         //playAudio(tracklist[num_tracks_played%TRACKLIST_SIZE]);
-        SongData song = complete_tracklist[num_tracks_played%ALL_TRACKS_SIZE];
+        now_playing_index = num_tracks_played%ALL_TRACKS_SIZE;
+        //hideStudioLabels();
+        genStudioLabels();
+        SongData song = complete_tracklist[now_playing_index];
         std::cout << "**** now playing: " << song.title << " by "<< song.artist << " | sample rate: " << song.sample_rate << std::endl;
-        playAudio(song.filename, song.sample_rate);
+        
+        playAudio(song.filename, song.sample_rate, song.royalty_cost);
         //std::cout << "**** now playing: " << tracklist[num_tracks_played%TRACKLIST_SIZE] << std::endl;
         std::string staticSound = "static" + std::to_string((num_tracks_played % 3)+1);
-        playAudio(staticSound, 44100);
+        playAudio(staticSound, 44100, 0);
     }
   }
 }
@@ -322,7 +390,7 @@ int main(int argc, char* argv[]) {
                         std::cout << "Starting game..." << std::endl;
                         game_started = true;
                         setBackground("studio");
-                        genNewMoneyLabel();
+                        genStudioLabels();
                     }
                     break;
                 case SDLK_a:
@@ -360,7 +428,7 @@ int main(int argc, char* argv[]) {
                         
                         std::cout << "change to see gheith..." << std::endl;
                         setBackground("gheith0");
-                        hideMoneyLabel();
+                        hideStudioLabels();
                     }
                     break;
                 case SDLK_x:
@@ -369,7 +437,7 @@ int main(int argc, char* argv[]) {
                         in_studio = true;
                         std::cout << "returning to studio..." << std::endl;
                         setBackground("studio");
-                        genNewMoneyLabel();
+                        genStudioLabels();
                     }
                     break;
                 default:
@@ -380,6 +448,8 @@ int main(int argc, char* argv[]) {
                 break;
         }
     }
+    SDL_RenderCopy(renderer, song_title_texture, NULL, &songTitleDstRect);
+    SDL_RenderCopy(renderer, artist_texture, NULL, &artistDstRect);
     SDL_RenderCopy(renderer, money_texture, NULL, &moneyDstRect);
     // update screen
     SDL_RenderPresent(renderer);
