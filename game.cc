@@ -2,6 +2,7 @@
 #include <SDL2/SDL_image.h>
 #include <iostream>
 #include <fstream>
+#include <thread>
 
 /*
 
@@ -16,6 +17,13 @@
 //  === GAME VARS ===
 bool game_started = false;
 bool in_studio = true;
+bool song_active = false;
+std::string tracklist[] = {"Drake-Passionfruit", "SEGA", "piano", "bobfm_spot", "drake_over", "shinobi3"};
+int num_tracks_played = 0;
+int money = 100;
+int exp_money_increment = 15;
+
+const int TRACKLIST_SIZE = 6;
 
 /*  
 
@@ -86,6 +94,7 @@ void playAudio(std::string audioName) {
 
     audioSpec.userdata = &audio;
 
+    song_active = true;
     SDL_AudioDeviceID deviceId = SDL_OpenAudioDevice(NULL, 0, &audioSpec, NULL, 0);
 
     if (deviceId == 0) {
@@ -95,10 +104,15 @@ void playAudio(std::string audioName) {
 
     SDL_PauseAudioDevice(deviceId, 0);
     // Wait for the audio to finish playing
-    while (audio.position < audio.length) {
+    while (audio.position < audio.length && song_active) {
         SDL_Delay(100);
     }
     SDL_CloseAudioDevice(deviceId);
+    num_tracks_played++;
+    if(num_tracks_played % 2 == 0) {
+        money += exp_money_increment;
+        std::cout << "Ad playing: money added! $" << money << std::endl;
+    }
 }
 
 /*
@@ -163,6 +177,17 @@ int initGame() {
     return 0;
 }
 
+void playAudioWrapper() {
+  playAudio("shinobi3");
+  while(true) {
+
+    if(in_studio) {
+        playAudio(tracklist[num_tracks_played%TRACKLIST_SIZE]);
+        std::cout << "**** now playing: " << tracklist[num_tracks_played%TRACKLIST_SIZE] << std::endl;
+    }
+  }
+}
+
 /*
     ~ main() ~
     the code that actually runs the game
@@ -172,7 +197,7 @@ int main(int argc, char* argv[]) {
 
     initGame();
     setBackground("title");
-    playAudio("SEGA");
+    std::thread audioThread(playAudioWrapper);
 
     // set up menu loop
     bool is_running = true;
@@ -199,6 +224,7 @@ int main(int argc, char* argv[]) {
                 switch (event.key.keysym.sym) {
                 case SDLK_RETURN:
                     if(!game_started) {
+                        song_active = false;
                         std::cout << "Starting game..." << std::endl;
                         game_started = true;
                         setBackground("studio");
@@ -234,6 +260,7 @@ int main(int argc, char* argv[]) {
                     break;
                 case SDLK_g:
                     if(in_studio) {
+                        song_active = false;
                         in_studio = false;
                         std::cout << "change to see gheith..." << std::endl;
                         setBackground("gheith0");
@@ -241,6 +268,7 @@ int main(int argc, char* argv[]) {
                     break;
                 case SDLK_x:
                     if(!in_studio) {
+                        song_active = true;
                         in_studio = true;
                         std::cout << "returning to studio..." << std::endl;
                         setBackground("studio");
