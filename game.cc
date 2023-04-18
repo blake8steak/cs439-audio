@@ -78,11 +78,6 @@ SDL_Surface *song_title_surface;
 SDL_Texture *song_title_texture;
 SDL_Rect songTitleDstRect = {245, 10, 325, 50};
 
-char artistBuff[30] = "Artist Name";
-SDL_Surface *artist_surface;
-SDL_Texture *artist_texture;
-SDL_Rect artistDstRect = {625, 10, 120, 50};
-
 /*
     ==== GAME METHODS ====
     the following methods are used for game mechanics.
@@ -139,11 +134,9 @@ void setBackground(std::string imgName) {
     }
 }
 
-void hideSongLabels() {
+void hideSongLabel() {
     SDL_FreeSurface(song_title_surface);
     SDL_DestroyTexture(song_title_texture);
-    SDL_FreeSurface(artist_surface);
-    SDL_DestroyTexture(artist_texture);
 }
 
 void hideMoneyLabel() {
@@ -166,7 +159,6 @@ void genNewMoneyLabel() {
 void genNewSongLabels(std::string title, std::string artist) {
     for(int i=0; i<45; i++) {
         songTitleBuff[i] = 0;
-        artistBuff[i] = 0;
     }
     for(int i=0; i<title.length(); i++) {
         songTitleBuff[i] = title[i];
@@ -179,11 +171,6 @@ void genNewSongLabels(std::string title, std::string artist) {
         std::cout << artist[i-(title.length()+3)];
         songTitleBuff[i] = artist[i-(title.length()+3)];
     }
-    // for(int i=0; i<title.length(); i++) {
-    //     artistBuff[i] = artist[i];
-    // }
-    // artist_surface = TTF_RenderText_Solid(prstartk, artistBuff, COLOR_WHITE);
-    // artist_texture = SDL_CreateTextureFromSurface(renderer, artist_surface);
     song_title_surface = TTF_RenderText_Solid(prstartk, songTitleBuff, COLOR_WHITE);
     song_title_texture = SDL_CreateTextureFromSurface(renderer, song_title_surface);
 }
@@ -195,7 +182,7 @@ void genStudioLabels() {
 
 void hideStudioLabels() {
     hideMoneyLabel();
-    hideSongLabels();
+    hideSongLabel();
 }
 
 void playAudio(std::string audioName, int sampleRate, int royalty_cost) {
@@ -457,7 +444,6 @@ int main(int argc, char* argv[]) {
         }
     }
     SDL_RenderCopy(renderer, song_title_texture, NULL, &songTitleDstRect);
-    SDL_RenderCopy(renderer, artist_texture, NULL, &artistDstRect);
     SDL_RenderCopy(renderer, money_texture, NULL, &moneyDstRect);
     // update screen
     SDL_RenderPresent(renderer);
