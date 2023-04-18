@@ -14,20 +14,6 @@
 
 */
 
-
-//  === GAME VARS ===
-bool game_started = false;
-bool in_studio = true;
-bool song_active = false;
-std::string all_tracks[] = { "Psy-GangnamStyle", "NickiMinaj-SuperBass", "Nickelback-Animals", "KatyPerry-CaliforniaGurls", "TravisScott-SickoMode", "Umbrella-Rihanna", "TaylorSwift-22", "SouljaBoy-CrankThat", "SheckWes-MoBamba", "LMFAO-PartyRockAnthem", "LilUziVert-JustWannaRock", "KanyeWest-CantTellMeNothing", "TaylorSwift-WeAreNeverEverGettingBackTogether", "FooFighters-Everlong", "Drake-Passionfruit", "LilWayne-BillGates", "GreenDay-Holiday", "GreenDay-BasketCase", "GreenDay-AmericanIdiot", "GreenDay-BoulevardofBrokenDreams" };
-std::string tracklist[] = {"Drake-Passionfruit", "LMFAO-PartyRockAnthem", "SouljaBoy-CrankThat", "KanyeWest-CantTellMeNothing", "LilWayne-BillGates", "TravisScott-SickoMode"};
-int num_tracks_played = 0;
-int money = 100;
-int exp_money_increment = 15;
-
-const int TRACKLIST_SIZE = 6;
-const int ALL_TRACKS_SIZE = 20;
-
 /*  
 
     === SYS VARS ===
@@ -48,6 +34,31 @@ struct AudioData {
 };
 AudioData audioData;
 
+
+//  === GAME VARS ===
+const int TRACKLIST_SIZE = 6;
+const int ALL_TRACKS_SIZE = 20;
+
+bool game_started = false;
+bool in_studio = true;
+bool song_active = false;
+
+struct SongData {
+    std::string filename;
+    std::string artist;
+    std::string title;
+    AudioData data;
+    int sample_rate; // 44.1kHz or 48kHz
+};
+std::string all_tracks[] = { "Psy-GangnamStyle", "NickiMinaj-SuperBass", "Nickelback-Animals", "KatyPerry-CaliforniaGurls", "TravisScott-SickoMode", "Umbrella-Rihanna", "TaylorSwift-22", "SouljaBoy-CrankThat", "SheckWes-MoBamba", "LMFAO-PartyRockAnthem", "LilUziVert-JustWannaRock", "KanyeWest-CantTellMeNothing", "TaylorSwift-WeAreNeverEverGettingBackTogether", "FooFighters-Everlong", "Drake-Passionfruit", "LilWayne-BillGates", "GreenDay-Holiday", "GreenDay-BasketCase", "GreenDay-AmericanIdiot", "GreenDay-BoulevardofBrokenDreams" };
+std::string tracklist[] = {"Drake-Passionfruit", "LMFAO-PartyRockAnthem", "SouljaBoy-CrankThat", "KanyeWest-CantTellMeNothing", "LilWayne-BillGates", "TravisScott-SickoMode"};
+SongData complete_tracklist[ALL_TRACKS_SIZE];
+
+int num_tracks_played = 0;
+int money = 100;
+int exp_money_increment = 15;
+
+
 // labels
 
 TTF_Font *prstartk;
@@ -62,6 +73,29 @@ SDL_Rect moneyDstRect = {10, 10, 100, 50};
     the following methods are used for game mechanics.
     changing scenes, 
 */
+void createSongArray() {
+    /*
+        std::string filename;
+        std::string artist;
+        std::string title;
+        AudioData data; // NOT SURE IF NEEDED
+        int sample_rate; // 44.1kHz or 48kHz
+    */
+
+    const int FOURTY_FOUR = 44100;
+    const int FOURTY_EIGHT = 48000;
+    std::string all_artists[] = {"Psy", "Nicki Minaj", "Nickelback", "Katy Perry", "Travis Scott", "Rihanna", "Taylor Swift", "Soulja Boy", "Sheck Wes", "LMFAO", "Lil Uzi Vert", "Kanye West", "Taylor Swift", "Foo Fighters", "Drake", "Lil Wayne", "Green Day", "Green Day", "Green Day", "Green Day"};
+    std::string all_titles[] = { "Gangnam Style", "Super Bass", "Animals", "California Gurls", "Sicko Mode", "Umbrella", "22", "Crank That (Soulja Boy)",  "Mo Bamba", "Party Rock Anthem", "Just Wanna Rock", "Can\'t Tell Me Nothing", "We Are Never Ever...", "Everlong", "Passionfruit", "Bill Gates", "Holiday", "Basket Case", "American Idiot", "Boulevard of Brok..."};
+    int all_sample_rates[] = { FOURTY_FOUR, FOURTY_EIGHT, FOURTY_FOUR, FOURTY_EIGHT, FOURTY_EIGHT, FOURTY_EIGHT, FOURTY_FOUR, FOURTY_EIGHT, FOURTY_EIGHT, FOURTY_FOUR, FOURTY_FOUR, FOURTY_EIGHT, FOURTY_EIGHT, FOURTY_FOUR, FOURTY_FOUR, FOURTY_EIGHT, FOURTY_EIGHT, FOURTY_FOUR, FOURTY_EIGHT, FOURTY_EIGHT};
+    // create all SongData objects here
+    for(int i=0; i<ALL_TRACKS_SIZE; i++) {
+        complete_tracklist[i].filename = all_tracks[i];
+        complete_tracklist[i].artist = all_artists[i];
+        complete_tracklist[i].title = all_titles[i];
+        complete_tracklist[i].sample_rate = all_sample_rates[i];
+    }
+}
+
 void setBackground(std::string imgName) {
     std::string path = "images/" + imgName + ".png";
     bgSurface = IMG_Load(&path[0]);
@@ -94,11 +128,11 @@ void genNewMoneyLabel() {
     money_texture = SDL_CreateTextureFromSurface(renderer, money_surface);
 }
 
-void playAudio(std::string audioName) {
+void playAudio(std::string audioName, int sampleRate) {
     std::string path = "sounds/" + audioName + ".wav";
     std::ifstream file(&path[0], std::ios::binary);
     if (!file.is_open()) {
-        std::cerr << "Failed to open audio file." << std::endl;
+        std::cerr << "Failed to open audio file: " << audioName << " | sample rate " << sampleRate << std::endl;
         return;
     }
 
@@ -116,6 +150,7 @@ void playAudio(std::string audioName) {
     audioData = audio;
 
     audioSpec.userdata = &audio;
+    audioSpec.freq = sampleRate;
 
     song_active = true;
     SDL_AudioDeviceID deviceId = SDL_OpenAudioDevice(NULL, 0, &audioSpec, NULL, 0);
@@ -184,7 +219,8 @@ int initGame() {
         return 1;
     }
     SDL_AudioSpec spec;
-    spec.freq = 44100;
+    //spec.freq = 44100;
+    spec.freq = 48000;
     spec.format = AUDIO_S16;
     spec.channels = 2;
     spec.samples = 4096;
@@ -217,6 +253,9 @@ int initGame() {
         return 1;
     }
 
+    // init song data
+    createSongArray();
+
     // init fonts, labels for text
     prstartk = TTF_OpenFont("fonts/prstartk.ttf", 24);
     money_surface = TTF_RenderText_Solid(prstartk, moneyBuff, COLOR_WHITE);
@@ -226,16 +265,17 @@ int initGame() {
 }
 
 void playAudioWrapper() {
-  playAudio("shinobi3");
+  playAudio("shinobi3", 44100);
   while(true) {
 
     if(in_studio) {
         //playAudio(tracklist[num_tracks_played%TRACKLIST_SIZE]);
-        playAudio(all_tracks[num_tracks_played%ALL_TRACKS_SIZE]);
+        SongData song = complete_tracklist[num_tracks_played%ALL_TRACKS_SIZE];
+        playAudio(song.filename, song.sample_rate);
         //std::cout << "**** now playing: " << tracklist[num_tracks_played%TRACKLIST_SIZE] << std::endl;
         std::cout << "**** now playing: " << all_tracks[num_tracks_played%ALL_TRACKS_SIZE] << std::endl;
         std::string staticSound = "static" + std::to_string((num_tracks_played % 3)+1);
-        playAudio(staticSound);
+        playAudio(staticSound, 44100);
     }
   }
 }
