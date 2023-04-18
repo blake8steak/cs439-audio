@@ -19,12 +19,14 @@
 bool game_started = false;
 bool in_studio = true;
 bool song_active = false;
-std::string tracklist[] = {"Drake-Passionfruit", "SEGA", "piano", "bobfm_spot", "drake_over", "shinobi3"};
+std::string all_tracks[] = { "Psy-GangnamStyle", "NickiMinaj-SuperBass", "Nickelback-Animals", "KatyPerry-CaliforniaGurls", "TravisScott-SickoMode", "Umbrella-Rihanna", "TaylorSwift-22", "SouljaBoy-CrankThat", "SheckWes-MoBamba", "LMFAO-PartyRockAnthem", "LilUziVert-JustWannaRock", "KanyeWest-CantTellMeNothing", "TaylorSwift-WeAreNeverEverGettingBackTogether", "FooFighters-Everlong", "Drake-Passionfruit", "LilWayne-BillGates", "GreenDay-Holiday", "GreenDay-BasketCase", "GreenDay-AmericanIdiot", "GreenDay-BoulevardofBrokenDreams" };
+std::string tracklist[] = {"Drake-Passionfruit", "LMFAO-PartyRockAnthem", "SouljaBoy-CrankThat", "KanyeWest-CantTellMeNothing", "LilWayne-BillGates", "TravisScott-SickoMode"};
 int num_tracks_played = 0;
 int money = 100;
 int exp_money_increment = 15;
 
 const int TRACKLIST_SIZE = 6;
+const int ALL_TRACKS_SIZE = 20;
 
 /*  
 
@@ -129,7 +131,11 @@ void playAudio(std::string audioName) {
         SDL_Delay(100);
     }
     SDL_CloseAudioDevice(deviceId);
+    if(audioName == "static1" || audioName == "static2" || audioName == "static3" || audioName == "shinobi3") {
+        return;
+    }
     num_tracks_played++;
+    std::cout << "incremented num_tracks_played: " << num_tracks_played << std::endl;
     if(num_tracks_played % 2 == 0) {
         money += exp_money_increment;
         std::cout << "Ad playing: money added! $" << money << std::endl;
@@ -224,8 +230,12 @@ void playAudioWrapper() {
   while(true) {
 
     if(in_studio) {
-        playAudio(tracklist[num_tracks_played%TRACKLIST_SIZE]);
-        std::cout << "**** now playing: " << tracklist[num_tracks_played%TRACKLIST_SIZE] << std::endl;
+        //playAudio(tracklist[num_tracks_played%TRACKLIST_SIZE]);
+        playAudio(all_tracks[num_tracks_played%ALL_TRACKS_SIZE]);
+        //std::cout << "**** now playing: " << tracklist[num_tracks_played%TRACKLIST_SIZE] << std::endl;
+        std::cout << "**** now playing: " << all_tracks[num_tracks_played%ALL_TRACKS_SIZE] << std::endl;
+        std::string staticSound = "static" + std::to_string((num_tracks_played % 3)+1);
+        playAudio(staticSound);
     }
   }
 }
@@ -240,6 +250,7 @@ int main(int argc, char* argv[]) {
     initGame();
     setBackground("title");
     std::thread audioThread(playAudioWrapper);
+
     hideMoneyLabel();
 
     // set up menu loop
