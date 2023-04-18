@@ -54,6 +54,9 @@ struct SongData {
     int index;
 };
 int tracklist[] = {0, 1, 2, 3, 4, 5};
+std::string static_sounds[] = {"static1", "static2", "static3"};
+std::string ads[] = {"ozempic", "whopper", "homedepot"};
+int ads_played = 0;
 SongData complete_tracklist[ALL_TRACKS_SIZE];
 
 int now_playing_index = tracklist[0];
@@ -223,7 +226,7 @@ void playAudio(std::string audioName, int sampleRate, int royalty_cost) {
         SDL_Delay(100);
     }
     SDL_CloseAudioDevice(deviceId);
-    if(audioName == "static1" || audioName == "static2" || audioName == "static3" || audioName == "shinobi3") {
+    if(audioName == "static1" || audioName == "static2" || audioName == "static3" || audioName == "shinobi3" || audioName == "whopper" || audioName == "homedepot" || audioName == "ozempic") {
         return;
     }
 
@@ -237,6 +240,9 @@ void playAudio(std::string audioName, int sampleRate, int royalty_cost) {
     std::cout << "incremented num_tracks_played: " << num_tracks_played << std::endl;
     if(num_tracks_played % 2 == 0) {
         money += exp_money_increment;
+        playAudio(static_sounds[ads_played%3], 44100, 0);
+        playAudio(ads[ads_played%3], 44100, 0);
+        ads_played++;
         std::cout << "+++++ Ad playing: money added! $" << money << std::endl;
         if(in_studio)
             genNewMoneyLabel();
