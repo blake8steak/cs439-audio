@@ -73,15 +73,15 @@ SDL_Surface *money_surface;
 SDL_Texture *money_texture;
 SDL_Rect moneyDstRect = {10, 10, 100, 50};
 
-char songTitleBuff[30] = "Title";
+char songTitleBuff[45] = "Title";
 SDL_Surface *song_title_surface;
 SDL_Texture *song_title_texture;
-SDL_Rect songTitleDstRect = {100, 100, 100, 50};
+SDL_Rect songTitleDstRect = {245, 10, 325, 50};
 
 char artistBuff[30] = "Artist Name";
 SDL_Surface *artist_surface;
 SDL_Texture *artist_texture;
-SDL_Rect artistDstRect = {200, 200, 100, 50};
+SDL_Rect artistDstRect = {625, 10, 120, 50};
 
 /*
     ==== GAME METHODS ====
@@ -101,7 +101,7 @@ void createSongArray() {
     const int FOURTY_EIGHT = 48000;
     std::string all_tracks[] = { "Psy-GangnamStyle", "NickiMinaj-SuperBass", "Nickelback-Animals", "KatyPerry-CaliforniaGurls", "TravisScott-SickoMode", "Umbrella-Rihanna", "TaylorSwift-22", "SouljaBoy-CrankThat", "SheckWes-MoBamba", "LMFAO-PartyRockAnthem", "LilUziVert-JustWannaRock", "KanyeWest-CantTellMeNothing", "TaylorSwift-WeAreNeverEverGettingBackTogether", "FooFighters-Everlong", "Drake-Passionfruit", "LilWayne-BillGates", "GreenDay-Holiday", "GreenDay-BasketCase", "GreenDay-AmericanIdiot", "GreenDay-BoulevardofBrokenDreams" };
     std::string all_artists[] = {"Psy", "Nicki Minaj", "Nickelback", "Katy Perry", "Travis Scott", "Rihanna", "Taylor Swift", "Soulja Boy", "Sheck Wes", "LMFAO", "Lil Uzi Vert", "Kanye West", "Taylor Swift", "Foo Fighters", "Drake", "Lil Wayne", "Green Day", "Green Day", "Green Day", "Green Day"};
-    std::string all_titles[] = { "Gangnam Style", "Super Bass", "Animals", "California Gurls", "Sicko Mode", "Umbrella", "22", "Crank That (Soulja Boy)",  "Mo Bamba", "Party Rock Anthem", "Just Wanna Rock", "Can\'t Tell Me Nothing", "We Are Never Ever...", "Everlong", "Passionfruit", "Bill Gates", "Holiday", "Basket Case", "American Idiot", "Boulevard of Brok..."};
+    std::string all_titles[] = { "Gangnam Style", "Super Bass", "Animals", "California Gurls", "Sicko Mode", "Umbrella", "22", "Crank That",  "Mo Bamba", "Party Rock Anthem", "Just Wanna Rock", "Can\'t Tell Me Nothing", "We Are Never Ever", "Everlong", "Passionfruit", "Bill Gates", "Holiday", "Basket Case", "American Idiot", "Bvld of BD"};
     int all_sample_rates[] = { FOURTY_FOUR, FOURTY_EIGHT, FOURTY_FOUR, FOURTY_EIGHT, FOURTY_EIGHT, FOURTY_EIGHT, FOURTY_FOUR, FOURTY_EIGHT, FOURTY_EIGHT, FOURTY_FOUR, FOURTY_FOUR, FOURTY_EIGHT, FOURTY_EIGHT, FOURTY_FOUR, FOURTY_FOUR, FOURTY_EIGHT, FOURTY_EIGHT, FOURTY_FOUR, FOURTY_EIGHT, FOURTY_EIGHT};
     int all_coolness_scores[] = { 2, 12, 9, 8, 5, 14, 22, 1, 6, 2, 7, 8, 21, 24, 10, 10, 21, 26, 29, 21}; //cool
     int all_royalty_costs[] = { 1, 15, 4, 7, 3, 8, 22, 1, 3, 1, 3, 8, 14, 10, 5, 4, 12, 9, 30, 22 }; //royalty
@@ -164,18 +164,26 @@ void genNewMoneyLabel() {
 }
 
 void genNewSongLabels(std::string title, std::string artist) {
-    for(int i=0; i<30; i++) {
+    for(int i=0; i<45; i++) {
         songTitleBuff[i] = 0;
         artistBuff[i] = 0;
     }
     for(int i=0; i<title.length(); i++) {
         songTitleBuff[i] = title[i];
     }
-    for(int i=0; i<title.length(); i++) {
-        artistBuff[i] = artist[i];
+    songTitleBuff[title.length()] = ' ';
+    songTitleBuff[title.length()+1] = '-';
+    songTitleBuff[title.length()+2] = ' ';
+    int maxIndex = title.length()+3+artist.length();
+    for(int i=title.length()+3; i<maxIndex; i++) {
+        std::cout << artist[i-(title.length()+3)];
+        songTitleBuff[i] = artist[i-(title.length()+3)];
     }
-    artist_surface = TTF_RenderText_Solid(prstartk, artistBuff, COLOR_WHITE);
-    artist_texture = SDL_CreateTextureFromSurface(renderer, artist_surface);
+    // for(int i=0; i<title.length(); i++) {
+    //     artistBuff[i] = artist[i];
+    // }
+    // artist_surface = TTF_RenderText_Solid(prstartk, artistBuff, COLOR_WHITE);
+    // artist_texture = SDL_CreateTextureFromSurface(renderer, artist_surface);
     song_title_surface = TTF_RenderText_Solid(prstartk, songTitleBuff, COLOR_WHITE);
     song_title_texture = SDL_CreateTextureFromSurface(renderer, song_title_surface);
 }
