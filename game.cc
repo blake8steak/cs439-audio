@@ -1,5 +1,6 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
+#include <SDL_ttf.h>
 #include <iostream>
 #include <fstream>
 #include <thread>
@@ -45,6 +46,15 @@ struct AudioData {
 };
 AudioData audioData;
 
+// labels
+
+TTF_Font *prstartk;
+SDL_Color COLOR_WHITE = {255, 255, 255};
+char moneyBuff[100] = "$100";
+SDL_Surface *money_surface;
+SDL_Texture *money_texture;
+SDL_Rect moneyDstRect = {10, 10, 100, 50};
+
 /*
     ==== GAME METHODS ====
     the following methods are used for game mechanics.
@@ -71,6 +81,17 @@ void setBackground(std::string imgName) {
         return;
     }
 }
+
+void hideMoneyLabel() {
+    SDL_FreeSurface(money_surface);
+    SDL_DestroyTexture(money_texture);
+}
+
+void genNewMoneyLabel() {
+    money_surface = TTF_RenderText_Solid(prstartk, moneyBuff, COLOR_WHITE);
+    money_texture = SDL_CreateTextureFromSurface(renderer, money_surface);
+}
+
 void playAudio(std::string audioName) {
     std::string path = "sounds/" + audioName + ".wav";
     std::ifstream file(&path[0], std::ios::binary);
@@ -112,6 +133,13 @@ void playAudio(std::string audioName) {
     if(num_tracks_played % 2 == 0) {
         money += exp_money_increment;
         std::cout << "Ad playing: money added! $" << money << std::endl;
+        std::string monStr = "$"+std::to_string(money);
+        for(int i=0; i<monStr.length(); i++) {
+            moneyBuff[i] = monStr[i];
+        }
+        std::cout << "moneyBuff - " << moneyBuff << std::endl;
+        if(in_studio)
+            genNewMoneyLabel();
     }
 }
 
@@ -174,6 +202,20 @@ int initGame() {
         return 1;
     }
 
+    // init SDL TTF
+    if (TTF_Init() != 0) {
+        std::cerr << "TTF_Init Error: " << TTF_GetError() << std::endl;
+        SDL_DestroyRenderer(renderer);
+        SDL_DestroyWindow(window);
+        SDL_Quit();
+        return 1;
+    }
+
+    // init fonts, labels for text
+    prstartk = TTF_OpenFont("fonts/prstartk.ttf", 24);
+    money_surface = TTF_RenderText_Solid(prstartk, moneyBuff, COLOR_WHITE);
+    money_texture = SDL_CreateTextureFromSurface(renderer, money_surface);
+
     return 0;
 }
 
@@ -198,6 +240,7 @@ int main(int argc, char* argv[]) {
     initGame();
     setBackground("title");
     std::thread audioThread(playAudioWrapper);
+    hideMoneyLabel();
 
     // set up menu loop
     bool is_running = true;
@@ -228,6 +271,7 @@ int main(int argc, char* argv[]) {
                         std::cout << "Starting game..." << std::endl;
                         game_started = true;
                         setBackground("studio");
+                        genNewMoneyLabel();
                     }
                     break;
                 case SDLK_a:
@@ -262,8 +306,10 @@ int main(int argc, char* argv[]) {
                     if(in_studio) {
                         song_active = false;
                         in_studio = false;
+                        
                         std::cout << "change to see gheith..." << std::endl;
                         setBackground("gheith0");
+                        hideMoneyLabel();
                     }
                     break;
                 case SDLK_x:
@@ -272,6 +318,7 @@ int main(int argc, char* argv[]) {
                         in_studio = true;
                         std::cout << "returning to studio..." << std::endl;
                         setBackground("studio");
+                        genNewMoneyLabel();
                     }
                     break;
                 default:
@@ -282,6 +329,7 @@ int main(int argc, char* argv[]) {
                 break;
         }
     }
+    SDL_RenderCopy(renderer, money_texture, NULL, &moneyDstRect);
     // update screen
     SDL_RenderPresent(renderer);
     SDL_Delay(16);
