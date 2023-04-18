@@ -50,7 +50,6 @@ struct SongData {
     AudioData data;
     int sample_rate; // 44.1kHz or 48kHz
 };
-std::string all_tracks[] = { "Psy-GangnamStyle", "NickiMinaj-SuperBass", "Nickelback-Animals", "KatyPerry-CaliforniaGurls", "TravisScott-SickoMode", "Umbrella-Rihanna", "TaylorSwift-22", "SouljaBoy-CrankThat", "SheckWes-MoBamba", "LMFAO-PartyRockAnthem", "LilUziVert-JustWannaRock", "KanyeWest-CantTellMeNothing", "TaylorSwift-WeAreNeverEverGettingBackTogether", "FooFighters-Everlong", "Drake-Passionfruit", "LilWayne-BillGates", "GreenDay-Holiday", "GreenDay-BasketCase", "GreenDay-AmericanIdiot", "GreenDay-BoulevardofBrokenDreams" };
 std::string tracklist[] = {"Drake-Passionfruit", "LMFAO-PartyRockAnthem", "SouljaBoy-CrankThat", "KanyeWest-CantTellMeNothing", "LilWayne-BillGates", "TravisScott-SickoMode"};
 SongData complete_tracklist[ALL_TRACKS_SIZE];
 
@@ -84,6 +83,7 @@ void createSongArray() {
 
     const int FOURTY_FOUR = 44100;
     const int FOURTY_EIGHT = 48000;
+    std::string all_tracks[] = { "Psy-GangnamStyle", "NickiMinaj-SuperBass", "Nickelback-Animals", "KatyPerry-CaliforniaGurls", "TravisScott-SickoMode", "Umbrella-Rihanna", "TaylorSwift-22", "SouljaBoy-CrankThat", "SheckWes-MoBamba", "LMFAO-PartyRockAnthem", "LilUziVert-JustWannaRock", "KanyeWest-CantTellMeNothing", "TaylorSwift-WeAreNeverEverGettingBackTogether", "FooFighters-Everlong", "Drake-Passionfruit", "LilWayne-BillGates", "GreenDay-Holiday", "GreenDay-BasketCase", "GreenDay-AmericanIdiot", "GreenDay-BoulevardofBrokenDreams" };
     std::string all_artists[] = {"Psy", "Nicki Minaj", "Nickelback", "Katy Perry", "Travis Scott", "Rihanna", "Taylor Swift", "Soulja Boy", "Sheck Wes", "LMFAO", "Lil Uzi Vert", "Kanye West", "Taylor Swift", "Foo Fighters", "Drake", "Lil Wayne", "Green Day", "Green Day", "Green Day", "Green Day"};
     std::string all_titles[] = { "Gangnam Style", "Super Bass", "Animals", "California Gurls", "Sicko Mode", "Umbrella", "22", "Crank That (Soulja Boy)",  "Mo Bamba", "Party Rock Anthem", "Just Wanna Rock", "Can\'t Tell Me Nothing", "We Are Never Ever...", "Everlong", "Passionfruit", "Bill Gates", "Holiday", "Basket Case", "American Idiot", "Boulevard of Brok..."};
     int all_sample_rates[] = { FOURTY_FOUR, FOURTY_EIGHT, FOURTY_FOUR, FOURTY_EIGHT, FOURTY_EIGHT, FOURTY_EIGHT, FOURTY_FOUR, FOURTY_EIGHT, FOURTY_EIGHT, FOURTY_FOUR, FOURTY_FOUR, FOURTY_EIGHT, FOURTY_EIGHT, FOURTY_FOUR, FOURTY_FOUR, FOURTY_EIGHT, FOURTY_EIGHT, FOURTY_FOUR, FOURTY_EIGHT, FOURTY_EIGHT};
@@ -271,9 +271,9 @@ void playAudioWrapper() {
     if(in_studio) {
         //playAudio(tracklist[num_tracks_played%TRACKLIST_SIZE]);
         SongData song = complete_tracklist[num_tracks_played%ALL_TRACKS_SIZE];
+        std::cout << "**** now playing: " << song.title << " by "<< song.artist << " | sample rate: " << song.sample_rate << std::endl;
         playAudio(song.filename, song.sample_rate);
         //std::cout << "**** now playing: " << tracklist[num_tracks_played%TRACKLIST_SIZE] << std::endl;
-        std::cout << "**** now playing: " << all_tracks[num_tracks_played%ALL_TRACKS_SIZE] << std::endl;
         std::string staticSound = "static" + std::to_string((num_tracks_played % 3)+1);
         playAudio(staticSound, 44100);
     }
