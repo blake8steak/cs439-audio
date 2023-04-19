@@ -674,6 +674,18 @@ void hideStudioLabels() {
     }
 }
 
+void handlePostTracklistEdit() {
+    setBackground("studio");
+    genStudioLabels();
+    hideTracklistLabels();
+    //getNewSongsForLabels();
+    confirming_song_selection = false;
+    editing_tracklist = false;
+    //viewing_tracklist = false;
+    browsing_new_songs = false;
+    in_studio = true;
+}
+
 void playAudio(std::string audioName, int sampleRate, int royalty_cost) {
     std::string path = "sounds/" + audioName + ".wav";
     std::ifstream file(&path[0], std::ios::binary);
@@ -974,6 +986,8 @@ int main(int argc, char* argv[]) {
                 case SDLK_1:
                     if(editing_tracklist) {
                         std::cout << "changing song 1, " << complete_tracklist[tracklist[0]].title << ", to " << complete_tracklist[selected_new_song].title << std::endl;
+                        tracklist[0] = selected_new_song;
+                        handlePostTracklistEdit();
                     } else if(browsing_new_songs) {
                         selected_new_song = randSongs[0];
                         std::cout << "selected option 1: " << complete_tracklist[selected_new_song].title << std::endl;
@@ -986,6 +1000,8 @@ int main(int argc, char* argv[]) {
                 case SDLK_2:
                     if(editing_tracklist) {
                         std::cout << "changing song 2, " << complete_tracklist[tracklist[1]].title << ", to " << complete_tracklist[selected_new_song].title << std::endl;
+                        tracklist[1] = selected_new_song;
+                        handlePostTracklistEdit();
                     } else if(browsing_new_songs) {
                         selected_new_song = randSongs[1];
                         std::cout << "selected option 2: " << complete_tracklist[selected_new_song].title << std::endl;
@@ -998,6 +1014,8 @@ int main(int argc, char* argv[]) {
                 case SDLK_3:
                     if(editing_tracklist) {
                         std::cout << "changing song 3, " << complete_tracklist[tracklist[2]].title << ", to " << complete_tracklist[selected_new_song].title << std::endl;
+                        tracklist[2] = selected_new_song;
+                        handlePostTracklistEdit();
                     } else if(browsing_new_songs) {
                         selected_new_song = randSongs[2];
                         std::cout << "selected option 3: " << complete_tracklist[selected_new_song].title << std::endl;
@@ -1010,16 +1028,22 @@ int main(int argc, char* argv[]) {
                 case SDLK_4:
                     if(editing_tracklist) {
                         std::cout << "changing song 4, " << complete_tracklist[tracklist[3]].title << ", to " << complete_tracklist[selected_new_song].title << std::endl;
+                        tracklist[3] = selected_new_song;
+                        handlePostTracklistEdit();
                     }
                     break;
                 case SDLK_5:
                     if(editing_tracklist) {
                         std::cout << "changing song 5, " << complete_tracklist[tracklist[4]].title << ", to " << complete_tracklist[selected_new_song].title << std::endl;
+                        tracklist[4] = selected_new_song;
+                        handlePostTracklistEdit();
                     }
                     break;
                 case SDLK_6:
                     if(editing_tracklist) {
                         std::cout << "changing song 6, " << complete_tracklist[tracklist[5]].title << ", to " << complete_tracklist[selected_new_song].title << std::endl;
+                        tracklist[0] = selected_new_song;
+                        handlePostTracklistEdit();
                     }
                     break;
                 default:
