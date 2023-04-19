@@ -88,6 +88,7 @@ int lifetime_coolness_points = 0;
 TTF_Font *prstartk;
 SDL_Color COLOR_WHITE = {255, 255, 255};
 SDL_Color COLOR_GREEN = {25, 255, 25};
+SDL_Color COLOR_DARK_GREEN = {80, 155, 80};
 SDL_Color COLOR_DARK_GRAY = {50, 50, 50};
 
 char moneyBuff[100] = "$100";
@@ -182,6 +183,20 @@ char newSubtitle3Buf[45] = "blah info new3";
 SDL_Surface *newSubtitle3_surface;
 SDL_Texture *newSubtitle3_texture;
 SDL_Rect newSubtitle3DstRect = {560, 370, 200, 35};
+//             -- new songs royalty amount text
+char newRoyalty1Buf[45] = "$xx/play";
+SDL_Surface *newRoyalty1_surface;
+SDL_Texture *newRoyalty1_texture;
+SDL_Rect newRoyalty1DstRect = {33, 420, 200, 20};
+char newRoyalty2Buf[45] = "$xx/play";
+SDL_Surface *newRoyalty2_surface;
+SDL_Texture *newRoyalty2_texture;
+SDL_Rect newRoyalty2DstRect = {299, 420, 200, 20};
+char newRoyalty3Buf[45] = "$xx/play";
+SDL_Surface *newRoyalty3_surface;
+SDL_Texture *newRoyalty3_texture;
+SDL_Rect newRoyalty3DstRect = {560, 420, 200, 20};
+
 /*
     ==== GAME METHODS ====
     the following methods are used for game mechanics.
@@ -285,6 +300,12 @@ void showNewSongLabels() {
     newSubtitle2_texture = SDL_CreateTextureFromSurface(renderer, newSubtitle2_surface);
     newSubtitle3_surface = TTF_RenderText_Solid(prstartk, newSubtitle3Buf, COLOR_DARK_GRAY);
     newSubtitle3_texture = SDL_CreateTextureFromSurface(renderer, newSubtitle3_surface);
+    newRoyalty1_surface = TTF_RenderText_Solid(prstartk, newRoyalty1Buf, COLOR_DARK_GREEN);
+    newRoyalty1_texture = SDL_CreateTextureFromSurface(renderer, newRoyalty1_surface);
+    newRoyalty2_surface = TTF_RenderText_Solid(prstartk, newRoyalty2Buf, COLOR_DARK_GREEN);
+    newRoyalty2_texture = SDL_CreateTextureFromSurface(renderer, newRoyalty2_surface);
+    newRoyalty3_surface = TTF_RenderText_Solid(prstartk, newRoyalty3Buf, COLOR_DARK_GREEN);
+    newRoyalty3_texture = SDL_CreateTextureFromSurface(renderer, newRoyalty3_surface);
 
     resizeRect(newTitle1DstRect, 47, 315, 175, 50);
     resizeRect(newTitle2DstRect, 310, 315, 175, 50);
@@ -292,6 +313,9 @@ void showNewSongLabels() {
     resizeRect(newSubtitle1DstRect, 33, 370, 200, 35);
     resizeRect(newSubtitle2DstRect, 299, 370, 200, 35);
     resizeRect(newSubtitle3DstRect, 560, 370, 200, 35);
+    resizeRect(newRoyalty1DstRect, 33, 435, 200, 20);
+    resizeRect(newRoyalty2DstRect, 299, 435, 200, 20);
+    resizeRect(newRoyalty3DstRect, 560, 435, 200, 20);
 
     // newTitle1DstRect = {47, 315, 175, 50};
     // newTitle2DstRect = {310, 315, 175, 50};
@@ -299,6 +323,9 @@ void showNewSongLabels() {
     // newSubtitle1DstRect = {33, 370, 200, 35};
     // newSubtitle2DstRect = {299, 370, 200, 35};
     // newSubtitle3DstRect = {560, 370, 200, 35};
+    // newRoyalty1DstRect = {33, 435, 200, 20};
+    // newRoyalty2DstRect = {299, 435, 200, 20};
+    // newRoyalty3DstRect = {560, 435, 200, 20};
 }
 
 void getNewSongsForLabels() {
@@ -349,6 +376,9 @@ void getNewSongsForLabels() {
         newSubtitle1Buf[i] = 0;
         newSubtitle2Buf[i] = 0;
         newSubtitle3Buf[i] = 0;
+        newRoyalty1Buf[i] = 0;
+        newRoyalty2Buf[i] = 0;
+        newRoyalty3Buf[i] = 0;
     }
 
     // populate title buffers
@@ -398,6 +428,19 @@ void getNewSongsForLabels() {
         appendToBuffer(newSubtitle3Buf, fourty_eight, song3Artist.length());
     }
 
+    std::string newRoyalty1 = std::to_string(complete_tracklist[randSongs[0]].royalty_cost);
+    std::string newRoyalty2 = std::to_string(complete_tracklist[randSongs[1]].royalty_cost);
+    std::string newRoyalty3 = std::to_string(complete_tracklist[randSongs[2]].royalty_cost);
+    appendToBuffer(newRoyalty1Buf, "$", 0);
+    appendToBuffer(newRoyalty2Buf, "$", 0);
+    appendToBuffer(newRoyalty3Buf, "$", 0);
+    appendToBuffer(newRoyalty1Buf, newRoyalty1, 1);
+    appendToBuffer(newRoyalty2Buf, newRoyalty2, 1);
+    appendToBuffer(newRoyalty3Buf, newRoyalty3, 1);
+    appendToBuffer(newRoyalty1Buf, "/play", newRoyalty1.length()+1);
+    appendToBuffer(newRoyalty2Buf, "/play", newRoyalty2.length()+1);
+    appendToBuffer(newRoyalty3Buf, "/play", newRoyalty3.length()+1);
+
     // remember to render the labels after calling this!
     //     renderNewSongLabels();
 }
@@ -417,12 +460,21 @@ void hideNewSongLabels() {
         SDL_DestroyTexture(newSubtitle2_texture);
         SDL_FreeSurface(newSubtitle3_surface);
         SDL_DestroyTexture(newSubtitle3_texture);
+        SDL_FreeSurface(newRoyalty1_surface);
+        SDL_DestroyTexture(newRoyalty1_texture);
+        SDL_FreeSurface(newRoyalty2_surface);
+        SDL_DestroyTexture(newRoyalty2_texture);
+        SDL_FreeSurface(newRoyalty3_surface);
+        SDL_DestroyTexture(newRoyalty3_texture);
         resizeRect(newTitle1DstRect, 0, 0, 0, 0);
         resizeRect(newTitle2DstRect, 0, 0, 0, 0);
         resizeRect(newTitle3DstRect, 0, 0, 0, 0);
         resizeRect(newSubtitle1DstRect, 0, 0, 0, 0);
         resizeRect(newSubtitle2DstRect, 0, 0, 0, 0);
         resizeRect(newSubtitle3DstRect, 0, 0, 0, 0);
+        resizeRect(newRoyalty1DstRect, 0, 0, 0, 0);
+        resizeRect(newRoyalty2DstRect, 0, 0, 0, 0);
+        resizeRect(newRoyalty3DstRect, 0, 0, 0, 0);
     }
 }
 
@@ -843,6 +895,9 @@ int main(int argc, char* argv[]) {
     SDL_RenderCopy(renderer, newSubtitle1_texture, NULL, &newSubtitle1DstRect);
     SDL_RenderCopy(renderer, newSubtitle2_texture, NULL, &newSubtitle2DstRect);
     SDL_RenderCopy(renderer, newSubtitle3_texture, NULL, &newSubtitle3DstRect);
+    SDL_RenderCopy(renderer, newRoyalty1_texture, NULL, &newRoyalty1DstRect);
+    SDL_RenderCopy(renderer, newRoyalty2_texture, NULL, &newRoyalty2DstRect);
+    SDL_RenderCopy(renderer, newRoyalty3_texture, NULL, &newRoyalty3DstRect);
     SDL_RenderCopy(renderer, song_title_texture, NULL, &songTitleDstRect);
     SDL_RenderCopy(renderer, money_texture, NULL, &moneyDstRect);
     // update screen
