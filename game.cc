@@ -70,16 +70,17 @@ int exp_money_increment = 15;
 */
 TTF_Font *prstartk;
 SDL_Color COLOR_WHITE = {255, 255, 255};
+SDL_Color COLOR_GREEN = {25, 255, 25};
 
 char moneyBuff[100] = "$100";
 SDL_Surface *money_surface;
 SDL_Texture *money_texture;
-SDL_Rect moneyDstRect = {10, 10, 100, 50};
+SDL_Rect moneyDstRect = {617, 32, 150, 30};
 
 char songTitleBuff[45] = "Title";
 SDL_Surface *song_title_surface;
 SDL_Texture *song_title_texture;
-SDL_Rect songTitleDstRect = {245, 10, 325, 50};
+SDL_Rect songTitleDstRect = {235, 10, 325, 50};
 
 /*
     ==== GAME METHODS ====
@@ -155,7 +156,7 @@ void genNewMoneyLabel() {
     for(int i=0; i<monStr.length(); i++) {
         moneyBuff[i] = monStr[i];
     }
-    money_surface = TTF_RenderText_Solid(prstartk, moneyBuff, COLOR_WHITE);
+    money_surface = TTF_RenderText_Solid(prstartk, moneyBuff, COLOR_GREEN);
     money_texture = SDL_CreateTextureFromSurface(renderer, money_surface);
 }
 
@@ -211,6 +212,11 @@ void playAudio(std::string audioName, int sampleRate, int royalty_cost) {
 
     audioSpec.userdata = &audio;
     audioSpec.freq = sampleRate;
+
+    //this is ugly but i'm lazy
+    if(audioName == "whopper") {
+        audioSpec.freq = 48000;
+    }
 
     song_active = true;
     SDL_AudioDeviceID deviceId = SDL_OpenAudioDevice(NULL, 0, &audioSpec, NULL, 0);
@@ -323,7 +329,7 @@ int initGame() {
 
     // init fonts, labels for text
     prstartk = TTF_OpenFont("fonts/prstartk.ttf", 24);
-    money_surface = TTF_RenderText_Solid(prstartk, moneyBuff, COLOR_WHITE);
+    money_surface = TTF_RenderText_Solid(prstartk, moneyBuff, COLOR_GREEN);
     money_texture = SDL_CreateTextureFromSurface(renderer, money_surface);
 
     return 0;
