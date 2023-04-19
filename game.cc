@@ -56,6 +56,7 @@ struct SongData {
     std::string filename;
     std::string artist;
     std::string title;
+    std::string cover_art;
     //AudioData data;
     int coolness_score;
     int royalty_cost;
@@ -83,6 +84,39 @@ int exp_money_increment = 15; //could vary depending on num active listeners
 int active_listeners = 12;
 int lifetime_coolness_points = 0;
 
+/*
+    images
+*/
+SDL_Surface*  tracklistCover1_surface;
+SDL_Texture* tracklistCover1_texture;
+SDL_Rect tracklistCover1DstRect = {50, 100, 150, 150};
+SDL_Surface*  tracklistCover2_surface;
+SDL_Texture* tracklistCover2_texture;
+SDL_Rect tracklistCover2DstRect = {50, 300, 150, 150};
+SDL_Surface*  tracklistCover3_surface;
+SDL_Texture* tracklistCover3_texture;
+SDL_Rect tracklistCover3DstRect = {50, 500, 150, 150};
+SDL_Surface*  tracklistCover4_surface;
+SDL_Texture* tracklistCover4_texture;
+SDL_Rect tracklistCover4DstRect = {320, 100, 150, 150};
+SDL_Surface*  tracklistCover5_surface;
+SDL_Texture* tracklistCover5_texture;
+SDL_Rect tracklistCover5DstRect = {320, 300, 150, 150};
+SDL_Surface*  tracklistCover6_surface;
+SDL_Texture* tracklistCover6_texture;
+SDL_Rect tracklistCover6DstRect = {320, 500, 150, 150};
+SDL_Surface*  newSongCover1_surface;
+SDL_Texture* newSongCover1_texture;
+SDL_Rect newSongCover1DstRect = {50, 10, 150, 150};
+SDL_Surface*  newSongCover2_surface;
+SDL_Texture* newSongCover2_texture;
+SDL_Rect newSongCover2DstRect = {275, 10, 150, 150};
+SDL_Surface*  newSongCover3_surface;
+SDL_Texture* newSongCover3_texture;
+SDL_Rect newSongCover3DstRect = {500, 10, 150, 150};
+SDL_Surface*  nowPlayingCover_surface;
+SDL_Texture* nowPlayingCover_texture;
+SDL_Rect nowPlayingCoverDstRect = {400, 100, 150, 150};
 /*
     label stuff
 */
@@ -225,6 +259,7 @@ void createSongArray() {
     std::string all_tracks[] = { "Psy-GangnamStyle", "NickiMinaj-SuperBass", "Nickelback-Animals", "KatyPerry-CaliforniaGurls", "TravisScott-SickoMode", "Umbrella-Rihanna", "TaylorSwift-22", "SouljaBoy-CrankThat", "SheckWes-MoBamba", "LMFAO-PartyRockAnthem", "LilUziVert-JustWannaRock", "KanyeWest-CantTellMeNothing", "TaylorSwift-WeAreNeverEverGettingBackTogether", "FooFighters-Everlong", "Drake-Passionfruit", "LilWayne-BillGates", "GreenDay-Holiday", "GreenDay-BasketCase", "GreenDay-AmericanIdiot", "GreenDay-BoulevardofBrokenDreams" };
     std::string all_artists[] = {"Psy", "Nicki Minaj", "Nickelback", "Katy Perry", "Travis Scott", "Rihanna", "Taylor Swift", "Soulja Boy", "Sheck Wes", "LMFAO", "Lil Uzi Vert", "Kanye West", "Taylor Swift", "Foo Fighters", "Drake", "Lil Wayne", "Green Day", "Green Day", "Green Day", "Green Day"};
     std::string all_titles[] = { "Gangnam Style", "Super Bass", "Animals", "California Gurls", "Sicko Mode", "Umbrella", "   22   ", "Crank That",  "Mo Bamba", "Party Rock Anthem", "Just Wanna Rock", "Can\'t Tell Me Nothing", "We Are Never Ever", "Everlong", "Passionfruit", "Bill Gates", "Holiday", "Basket Case", "American Idiot", "Bvld of BD"};
+    std::string all_cover_art[] = {"psy-cover", "nickiminaj-cover", "nickelback-cover", "katyperry-cover", "travisscott-cover", "rihanna-cover", "taylorswift-cover", "souljaboy-cover", "sheckwes-cover", "lmfao-cover", "liluzivert-cover", "kanye-cover", "taylorswift-cover", "foofighters-cover", "drake-cover", "lilwayne-cover", "greenday-cover", "greenday-cover", "greenday-cover", "greenday-cover"};
     int all_sample_rates[] = { FOURTY_FOUR, FOURTY_EIGHT, FOURTY_FOUR, FOURTY_EIGHT, FOURTY_EIGHT, FOURTY_EIGHT, FOURTY_FOUR, FOURTY_EIGHT, FOURTY_EIGHT, FOURTY_FOUR, FOURTY_FOUR, FOURTY_EIGHT, FOURTY_EIGHT, FOURTY_FOUR, FOURTY_FOUR, FOURTY_EIGHT, FOURTY_EIGHT, FOURTY_FOUR, FOURTY_EIGHT, FOURTY_EIGHT};
     int all_coolness_scores[] = { 2, 12, 9, 8, 5, 14, 22, 1, 6, 2, 7, 8, 21, 24, 10, 10, 21, 26, 29, 21}; //cool
     int all_royalty_costs[] = { 1, 15, 4, 7, 3, 8, 22, 1, 3, 1, 3, 8, 14, 10, 5, 4, 12, 9, 30, 22 }; //royalty
@@ -236,6 +271,7 @@ void createSongArray() {
         complete_tracklist[i].sample_rate = all_sample_rates[i];
         complete_tracklist[i].coolness_score = all_coolness_scores[i];
         complete_tracklist[i].royalty_cost = all_royalty_costs[i];
+        complete_tracklist[i].cover_art = all_cover_art[i];
         complete_tracklist[i].index = i;
     }
 }
@@ -244,7 +280,7 @@ void setBackground(std::string imgName) {
     std::string path = "images/" + imgName + ".png";
     bgSurface = IMG_Load(&path[0]);
     if (bgSurface == nullptr) {
-        std::cerr << "IMG_Load Error: " << IMG_GetError() << std::endl;
+        std::cerr << "bg IMG_Load Error: " << IMG_GetError() << std::endl;
         SDL_DestroyRenderer(renderer);
         SDL_DestroyWindow(window);
         SDL_Quit();
@@ -254,7 +290,7 @@ void setBackground(std::string imgName) {
     bgTexture = SDL_CreateTextureFromSurface(renderer, bgSurface);
     SDL_FreeSurface(bgSurface);
     if (bgTexture == nullptr) {
-        std::cerr << "SDL_CreateTextureFromSurface Error: " << SDL_GetError() << std::endl;
+        std::cerr << "bg SDL_CreateTextureFromSurface Error: " << SDL_GetError() << std::endl;
         SDL_DestroyRenderer(renderer);
         SDL_DestroyWindow(window);
         SDL_Quit();
@@ -285,6 +321,53 @@ void showNewSongSelectLabel() {
 
 void hideNewSongSelectLabel() {
     resizeRect(newSongSelectDstRect, 0, 0, 0, 0);
+}
+
+void setTracklistImages() {
+    std::cout << "setting tracklist images..." << std::endl;
+    std::string path1 = "images/" + complete_tracklist[tracklist[0]].cover_art + ".png";
+    std::string path2 = "images/" + complete_tracklist[tracklist[1]].cover_art + ".png";
+    std::string path3 = "images/" + complete_tracklist[tracklist[2]].cover_art + ".png";
+    std::string path4 = "images/" + complete_tracklist[tracklist[3]].cover_art + ".png";
+    std::string path5 = "images/" + complete_tracklist[tracklist[4]].cover_art + ".png";
+    std::string path6 = "images/" + complete_tracklist[tracklist[5]].cover_art + ".png";
+    tracklistCover1_surface = IMG_Load(&path1[0]);
+    tracklistCover1_texture = SDL_CreateTextureFromSurface(renderer, tracklistCover1_surface);
+    std::cout << "---- got 1 done..." << path1 <<  std::endl;
+    tracklistCover2_surface = IMG_Load(&path2[0]);
+    tracklistCover2_texture = SDL_CreateTextureFromSurface(renderer, tracklistCover2_surface);
+    std::cout << "---- got 2 done..." << path2 << std::endl;
+    tracklistCover3_surface = IMG_Load(&path3[0]);
+    tracklistCover3_texture = SDL_CreateTextureFromSurface(renderer, tracklistCover3_surface);
+    std::cout << "---- got 3 done..." << path3 << std::endl;
+    tracklistCover4_surface = IMG_Load(&path4[0]);
+    tracklistCover4_texture = SDL_CreateTextureFromSurface(renderer, tracklistCover4_surface);
+    std::cout << "---- got 4 done..." << path4 << std::endl;
+    tracklistCover5_surface = IMG_Load(&path5[0]);
+    tracklistCover5_texture = SDL_CreateTextureFromSurface(renderer, tracklistCover5_surface);
+    std::cout << "---- got 5 done..." << path5 << std::endl;
+    tracklistCover6_surface = IMG_Load(&path6[0]);
+    tracklistCover6_texture = SDL_CreateTextureFromSurface(renderer, tracklistCover6_surface);
+    std::cout << "---- got 6 done..." << path6 << std::endl;
+    resizeRect(tracklistCover1DstRect, 50, 100, 150, 150);
+    resizeRect(tracklistCover2DstRect, 50, 300, 150, 150);
+    resizeRect(tracklistCover3DstRect, 50, 500, 150, 150);
+    resizeRect(tracklistCover4DstRect, 320, 100, 150, 150);
+    resizeRect(tracklistCover5DstRect, 320, 300, 150, 150);
+    resizeRect(tracklistCover6DstRect, 320, 500, 150, 150);
+    // if (*tracklistCover1_surface == nullptr) {
+    //     std::cerr << "image1 IMG_Load Error: " << IMG_GetError() << std::endl;
+    //     SDL_DestroyRenderer(renderer);
+    //     SDL_Quit();
+    //     return;
+    // }
+
+    // if (*texture == nullptr) {
+    //     std::cerr << "image1 SDL_CreateTextureFromSurface Error: " << SDL_GetError() << std::endl;
+    //     SDL_DestroyRenderer(renderer);
+    //     SDL_Quit();
+    //     return;
+    // }
 }
 
 void showTracklistLabels() {
@@ -375,6 +458,10 @@ void showTracklistLabels() {
     resizeRect(trackSubtitle4DstRect, 540, 150, 165, 20);
     resizeRect(trackSubtitle5DstRect, 540, 305, 165, 20);
     resizeRect(trackSubtitle6DstRect, 540, 460, 165, 20);
+
+    // set images 
+    // setImage(name, surface, texture);
+    setTracklistImages();
 }
 
 void showNewSongLabels() {
@@ -596,6 +683,29 @@ void hideTracklistLabels() {
         SDL_DestroyTexture(trackSubtitle5_texture);
         SDL_FreeSurface(trackSubtitle6_surface);
         SDL_DestroyTexture(trackSubtitle6_texture);
+
+
+        SDL_FreeSurface(tracklistCover1_surface);
+        SDL_DestroyTexture(tracklistCover1_texture);
+        SDL_FreeSurface(tracklistCover2_surface);
+        SDL_DestroyTexture(tracklistCover2_texture);
+        SDL_FreeSurface(tracklistCover3_surface);
+        SDL_DestroyTexture(tracklistCover3_texture);
+        SDL_FreeSurface(tracklistCover4_surface);
+        SDL_DestroyTexture(tracklistCover4_texture);
+        SDL_FreeSurface(tracklistCover5_surface);
+        SDL_DestroyTexture(tracklistCover5_texture);
+        SDL_FreeSurface(tracklistCover6_surface);
+        SDL_DestroyTexture(tracklistCover6_texture);
+
+        // SDL_Rect tracklistCover1DstRect = {50, 100, 150, 150};
+        // SDL_Rect tracklistCover2DstRect = {50, 300, 150, 150};
+        // SDL_Rect tracklistCover3DstRect = {50, 500, 150, 150};
+        // SDL_Rect tracklistCover4DstRect = {320, 10, 150, 150};
+        // SDL_Rect tracklistCover5DstRect = {320, 10, 150, 150};
+        // SDL_Rect tracklistCover6DstRect = {320, 10, 150, 150};
+
+
         resizeRect(trackTitle1DstRect, 0, 0, 0, 0);
         resizeRect(trackTitle2DstRect, 0, 0, 0, 0);
         resizeRect(trackTitle3DstRect, 0, 0, 0, 0);
@@ -608,6 +718,12 @@ void hideTracklistLabels() {
         resizeRect(trackSubtitle4DstRect, 0, 0, 0, 0);
         resizeRect(trackSubtitle5DstRect, 0, 0, 0, 0);
         resizeRect(trackSubtitle6DstRect, 0, 0, 0, 0);
+        resizeRect(tracklistCover1DstRect, 0, 0, 0, 0);
+        resizeRect(tracklistCover2DstRect, 0, 0, 0, 0);
+        resizeRect(tracklistCover3DstRect, 0, 0, 0, 0);
+        resizeRect(tracklistCover4DstRect, 0, 0, 0, 0);
+        resizeRect(tracklistCover5DstRect, 0, 0, 0, 0);
+        resizeRect(tracklistCover6DstRect, 0, 0, 0, 0);
     }
 }
 
@@ -741,7 +857,7 @@ void playAudio(std::string audioName, int sampleRate, int royalty_cost) {
         genStudioLabels();
     //std::cout << "-------- song played: paying $" << royalty_cost << " in royalties :( $" << money << std::endl;
     std::cout << "incremented num_tracks_played: " << num_tracks_played << std::endl;
-    if(num_tracks_played % 3 == 0)
+    if(num_tracks_played % 3 == 0 && in_studio)
         getNewSongsForLabels();
     if(num_tracks_played % 2 == 0 && in_studio) {
         money += exp_money_increment;
@@ -1054,6 +1170,14 @@ int main(int argc, char* argv[]) {
                 break;
         }
     }
+    //images
+    SDL_RenderCopy(renderer, tracklistCover1_texture, NULL, &tracklistCover1DstRect);
+    SDL_RenderCopy(renderer, tracklistCover2_texture, NULL, &tracklistCover2DstRect);
+    SDL_RenderCopy(renderer, tracklistCover3_texture, NULL, &tracklistCover3DstRect);
+    SDL_RenderCopy(renderer, tracklistCover4_texture, NULL, &tracklistCover4DstRect);
+    SDL_RenderCopy(renderer, tracklistCover5_texture, NULL, &tracklistCover5DstRect);
+    SDL_RenderCopy(renderer, tracklistCover6_texture, NULL, &tracklistCover6DstRect);
+    //labels
     SDL_RenderCopy(renderer, trackTitle1_texture, NULL, &trackTitle1DstRect);
     SDL_RenderCopy(renderer, trackTitle2_texture, NULL, &trackTitle2DstRect);
     SDL_RenderCopy(renderer, trackTitle3_texture, NULL, &trackTitle3DstRect);
