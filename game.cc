@@ -76,6 +76,7 @@ int lifetime_coolness_points = 0;
 TTF_Font *prstartk;
 SDL_Color COLOR_WHITE = {255, 255, 255};
 SDL_Color COLOR_GREEN = {25, 255, 25};
+SDL_Color COLOR_DARK_GRAY = {50, 50, 50};
 
 char moneyBuff[100] = "$100";
 SDL_Surface *money_surface;
@@ -141,28 +142,28 @@ SDL_Rect trackSubtitle6DstRect = {550, 400, 120, 35};
 char newTitle1Buf[45] = "new1";
 SDL_Surface *newTitle1_surface;
 SDL_Texture *newTitle1_texture;
-SDL_Rect newTitle1DstRect = {50, 100, 120, 35};
+SDL_Rect newTitle1DstRect = {47, 315, 175, 50};
 char newTitle2Buf[45] = "new2";
 SDL_Surface *newTitle2_surface;
 SDL_Texture *newTitle2_texture;
-SDL_Rect newTitle2DstRect = {50, 250, 120, 35};
+SDL_Rect newTitle2DstRect = {310, 315, 175, 50};
 char newTitle3Buf[45] = "new3";
 SDL_Surface *newTitle3_surface;
 SDL_Texture *newTitle3_texture;
-SDL_Rect newTitle3DstRect = {50, 250, 120, 35};
+SDL_Rect newTitle3DstRect = {573, 315, 175, 50};
 //             -- new subtitles
 char newSubtitle1Buf[45] = "blah info new1";
 SDL_Surface *newSubtitle1_surface;
 SDL_Texture *newSubtitle1_texture;
-SDL_Rect newSubtitle1DstRect = {50, 100, 120, 35};
+SDL_Rect newSubtitle1DstRect = {33, 370, 200, 35};
 char newSubtitle2Buf[45] = "blah info new2";
 SDL_Surface *newSubtitle2_surface;
 SDL_Texture *newSubtitle2_texture;
-SDL_Rect newSubtitle2DstRect = {50, 250, 120, 35};
+SDL_Rect newSubtitle2DstRect = {299, 370, 200, 35};
 char newSubtitle3Buf[45] = "blah info new3";
 SDL_Surface *newSubtitle3_surface;
 SDL_Texture *newSubtitle3_texture;
-SDL_Rect newSubtitle3DstRect = {50, 400, 120, 35};
+SDL_Rect newSubtitle3DstRect = {560, 370, 200, 35};
 
 /*
     ==== GAME METHODS ====
@@ -182,7 +183,7 @@ void createSongArray() {
     const int FOURTY_EIGHT = 48000;
     std::string all_tracks[] = { "Psy-GangnamStyle", "NickiMinaj-SuperBass", "Nickelback-Animals", "KatyPerry-CaliforniaGurls", "TravisScott-SickoMode", "Umbrella-Rihanna", "TaylorSwift-22", "SouljaBoy-CrankThat", "SheckWes-MoBamba", "LMFAO-PartyRockAnthem", "LilUziVert-JustWannaRock", "KanyeWest-CantTellMeNothing", "TaylorSwift-WeAreNeverEverGettingBackTogether", "FooFighters-Everlong", "Drake-Passionfruit", "LilWayne-BillGates", "GreenDay-Holiday", "GreenDay-BasketCase", "GreenDay-AmericanIdiot", "GreenDay-BoulevardofBrokenDreams" };
     std::string all_artists[] = {"Psy", "Nicki Minaj", "Nickelback", "Katy Perry", "Travis Scott", "Rihanna", "Taylor Swift", "Soulja Boy", "Sheck Wes", "LMFAO", "Lil Uzi Vert", "Kanye West", "Taylor Swift", "Foo Fighters", "Drake", "Lil Wayne", "Green Day", "Green Day", "Green Day", "Green Day"};
-    std::string all_titles[] = { "Gangnam Style", "Super Bass", "Animals", "California Gurls", "Sicko Mode", "Umbrella", "22", "Crank That",  "Mo Bamba", "Party Rock Anthem", "Just Wanna Rock", "Can\'t Tell Me Nothing", "We Are Never Ever", "Everlong", "Passionfruit", "Bill Gates", "Holiday", "Basket Case", "American Idiot", "Bvld of BD"};
+    std::string all_titles[] = { "Gangnam Style", "Super Bass", "Animals", "California Gurls", "Sicko Mode", "Umbrella", "   22   ", "Crank That",  "Mo Bamba", "Party Rock Anthem", "Just Wanna Rock", "Can\'t Tell Me Nothing", "We Are Never Ever", "Everlong", "Passionfruit", "Bill Gates", "Holiday", "Basket Case", "American Idiot", "Bvld of BD"};
     int all_sample_rates[] = { FOURTY_FOUR, FOURTY_EIGHT, FOURTY_FOUR, FOURTY_EIGHT, FOURTY_EIGHT, FOURTY_EIGHT, FOURTY_FOUR, FOURTY_EIGHT, FOURTY_EIGHT, FOURTY_FOUR, FOURTY_FOUR, FOURTY_EIGHT, FOURTY_EIGHT, FOURTY_FOUR, FOURTY_FOUR, FOURTY_EIGHT, FOURTY_EIGHT, FOURTY_FOUR, FOURTY_EIGHT, FOURTY_EIGHT};
     int all_coolness_scores[] = { 2, 12, 9, 8, 5, 14, 22, 1, 6, 2, 7, 8, 21, 24, 10, 10, 21, 26, 29, 21}; //cool
     int all_royalty_costs[] = { 1, 15, 4, 7, 3, 8, 22, 1, 3, 1, 3, 8, 14, 10, 5, 4, 12, 9, 30, 22 }; //royalty
@@ -229,17 +230,17 @@ void appendToBuffer(char buffer[], std::string stringToAdd, int startIndex) {
 }
 
 void showNewSongLabels() {
-    newTitle1_surface = TTF_RenderText_Solid(prstartk, newTitle1Buf, COLOR_WHITE);
+    newTitle1_surface = TTF_RenderText_Solid(prstartk, newTitle1Buf, COLOR_DARK_GRAY);
     newTitle1_texture = SDL_CreateTextureFromSurface(renderer, newTitle1_surface);
-    newTitle2_surface = TTF_RenderText_Solid(prstartk, newTitle2Buf, COLOR_WHITE);
+    newTitle2_surface = TTF_RenderText_Solid(prstartk, newTitle2Buf, COLOR_DARK_GRAY);
     newTitle2_texture = SDL_CreateTextureFromSurface(renderer, newTitle2_surface);
-    newTitle3_surface = TTF_RenderText_Solid(prstartk, newTitle3Buf, COLOR_WHITE);
+    newTitle3_surface = TTF_RenderText_Solid(prstartk, newTitle3Buf, COLOR_DARK_GRAY);
     newTitle3_texture = SDL_CreateTextureFromSurface(renderer, newTitle3_surface);
-    newSubtitle1_surface = TTF_RenderText_Solid(prstartk, newSubtitle1Buf, COLOR_WHITE);
+    newSubtitle1_surface = TTF_RenderText_Solid(prstartk, newSubtitle1Buf, COLOR_DARK_GRAY);
     newSubtitle1_texture = SDL_CreateTextureFromSurface(renderer, newSubtitle1_surface);
-    newSubtitle2_surface = TTF_RenderText_Solid(prstartk, newSubtitle2Buf, COLOR_WHITE);
+    newSubtitle2_surface = TTF_RenderText_Solid(prstartk, newSubtitle2Buf, COLOR_DARK_GRAY);
     newSubtitle2_texture = SDL_CreateTextureFromSurface(renderer, newSubtitle2_surface);
-    newSubtitle3_surface = TTF_RenderText_Solid(prstartk, newSubtitle3Buf, COLOR_WHITE);
+    newSubtitle3_surface = TTF_RenderText_Solid(prstartk, newSubtitle3Buf, COLOR_DARK_GRAY);
     newSubtitle3_texture = SDL_CreateTextureFromSurface(renderer, newSubtitle3_surface);
 }
 
@@ -652,9 +653,11 @@ int main(int argc, char* argv[]) {
                         in_studio = false;
                         std::cout << "change to new songs..." << std::endl;
                         setBackground("newSongs");
+                        browsing_new_songs = true;
+                        getNewSongsForLabels();
+                        showNewSongLabels();
                         hideMoneyLabel();
                         hideSongLabel();
-                        browsing_new_songs = true;
                     }
                     break;
                 case SDLK_g:
@@ -675,6 +678,7 @@ int main(int argc, char* argv[]) {
                         std::cout << "returning to studio..." << std::endl;
                         setBackground("studio");
                         genStudioLabels();
+                        hideNewSongLabels();
                     }
                     break;
                 case SDLK_1:
