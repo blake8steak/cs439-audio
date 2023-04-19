@@ -53,17 +53,21 @@ struct SongData {
     int sample_rate; // 44.1kHz or 48kHz
     int index;
 };
-int tracklist[] = {0, 1, 2, 3, 4, 5};
+int tracklist[] = {4, 8, 9, 11, 14, 15};
 std::string static_sounds[] = {"static1", "static2", "static3"};
-std::string ads[] = {"ozempic", "whopper", "homedepot"};
+std::string ads[] = {"whopper", "ozempic", "homedepot"};
 int ads_played = 0;
 SongData complete_tracklist[ALL_TRACKS_SIZE];
-
 int now_playing_index = tracklist[0];
 int num_tracks_played = 0;
-int money = 100;
-int exp_money_increment = 15;
 
+/*
+    game score/achievement level vars
+*/
+int money = 100;
+int exp_money_increment = 15; //could vary depending on num active listeners
+int active_listeners = 12;
+int lifetime_coolness_points = 0;
 
 /*
     label stuff
@@ -181,7 +185,7 @@ void genNewSongLabels(std::string title, std::string artist) {
 
 void genStudioLabels() {
     genNewMoneyLabel();
-    genNewSongLabels(complete_tracklist[now_playing_index].title, complete_tracklist[now_playing_index].artist);
+    genNewSongLabels(complete_tracklist[tracklist[now_playing_index]].title, complete_tracklist[tracklist[now_playing_index]].artist);
 }
 
 void hideStudioLabels() {
@@ -351,9 +355,10 @@ void playAudioWrapper() {
   while(true) {
 
     if(in_studio) {
-        now_playing_index = num_tracks_played%ALL_TRACKS_SIZE;
+        now_playing_index = num_tracks_played%TRACKLIST_SIZE;
         genStudioLabels();
-        SongData song = complete_tracklist[now_playing_index];
+        //SongData song = complete_tracklist[now_playing_index];
+        SongData song = complete_tracklist[tracklist[now_playing_index]];
         std::cout << "**** now playing: " << song.title << " by "<< song.artist << " | sample rate: " << song.sample_rate << std::endl;   
         playAudio(song.filename, song.sample_rate, song.royalty_cost);
         playAudio(static_sounds[num_tracks_played%3], 44100, 0);
@@ -409,15 +414,17 @@ int main(int argc, char* argv[]) {
                 case SDLK_v:
                     if(in_studio) {
                         in_studio = false;
-                        std::cout << "change to buy new songs..." << std::endl;
+                        std::cout << "change to view tracklist..." << std::endl;
                         setBackground("buy");
                     }
                     break;
                 case SDLK_n:
                     if(in_studio) {
                         in_studio = false;
-                        std::cout << "change to edit setlist..." << std::endl;
-                        setBackground("setlist");
+                        std::cout << "change to new songs..." << std::endl;
+                        setBackground("newSongs");
+                        hideMoneyLabel();
+                        hideSongLabel();
                     }
                     break;
                 case SDLK_g:
