@@ -63,7 +63,7 @@ struct SongData {
 };
 
 // used for new songs array
-int randSongs[] = { rand()%ALL_TRACKS_SIZE, rand()%ALL_TRACKS_SIZE, rand()%ALL_TRACKS_SIZE };
+int randSongs[] = { 0, 0, 0 }; //rand()%ALL_TRACKS_SIZE, rand()%ALL_TRACKS_SIZE, rand()%ALL_TRACKS_SIZE
 
 int tracklist[] = {4, 8, 9, 11, 14, 15};
 std::string static_sounds[] = {"static1", "static2", "static3"};
@@ -308,15 +308,32 @@ void getNewSongsForLabels() {
     bool foundNewSongs = false;
     int numGood = 0;
 
+    randSongs[0] = rand()%ALL_TRACKS_SIZE;
+    randSongs[1] = rand()%ALL_TRACKS_SIZE;
+    randSongs[2] = rand()%ALL_TRACKS_SIZE;
+
     while(!foundNewSongs) {
+        bool isBad = false;
         for(int i=0; i<TRACKLIST_SIZE; i++) {
-            if(tracklist[i] == randSongs[i]) {
+            // check if it's in tracklist
+            if(tracklist[i] == randSongs[numGood]) {
                 // not a new song
-                randSongs[i] = rand()%ALL_TRACKS_SIZE;
+                randSongs[numGood] = rand()%ALL_TRACKS_SIZE;
+                isBad = true;
+            }
+        }
+        for(int j=0; j<3; j++) {
+            //check if it's already in randSongs
+            if(j == numGood) {
+                continue;
+            } else if(randSongs[j] == randSongs[numGood]) {
+                randSongs[numGood] = rand()%ALL_TRACKS_SIZE;
+                isBad = true;
                 break;
             }
         }
-        numGood++;
+        if(!isBad)
+            numGood++;
         if(numGood == 3) {
             // found 3 new songs that don't exist in tracklist
             foundNewSongs = true;
@@ -557,6 +574,8 @@ void playAudio(std::string audioName, int sampleRate, int royalty_cost) {
         genStudioLabels();
     //std::cout << "-------- song played: paying $" << royalty_cost << " in royalties :( $" << money << std::endl;
     std::cout << "incremented num_tracks_played: " << num_tracks_played << std::endl;
+    if(num_tracks_played % 3 == 0)
+        getNewSongsForLabels();
     if(num_tracks_played % 2 == 0 && in_studio) {
         money += exp_money_increment;
         // do you want to be able to spam 'g''x''g''x' and make bank??
@@ -656,6 +675,9 @@ int initGame() {
     money_surface = TTF_RenderText_Solid(prstartk, moneyBuff, COLOR_GREEN);
     money_texture = SDL_CreateTextureFromSurface(renderer, money_surface);
 
+    // get some random songs in new
+    getNewSongsForLabels();
+
     return 0;
 }
 
@@ -741,7 +763,6 @@ int main(int argc, char* argv[]) {
                         browsing_new_songs = true;
                         std::cout << "change to new songs..." << std::endl;
                         setBackground("newSongs");
-                        getNewSongsForLabels();
                         showNewSongLabels();
                         hideStudioLabels();
                     }
