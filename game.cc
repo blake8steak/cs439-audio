@@ -48,6 +48,7 @@ bool in_studio = true;
 bool song_active = false;
 bool browsing_new_songs = false;
 bool confirming_song_selection = false;
+bool editing_tracklist = false;
 bool viewing_tracklist = false;
 bool checking_gheith = false;
 
@@ -897,6 +898,9 @@ int main(int argc, char* argv[]) {
                     }
                     break;
                 case SDLK_v:
+                    if(confirming_song_selection || editing_tracklist) {
+                        break;
+                    }
                     if(in_studio && !checking_gheith && !browsing_new_songs && !viewing_tracklist) {
                         in_studio = false;
                         viewing_tracklist = true;
@@ -907,6 +911,9 @@ int main(int argc, char* argv[]) {
                     }
                     break;
                 case SDLK_n:
+                    if(confirming_song_selection || editing_tracklist) {
+                        break;
+                    }
                     if(confirming_song_selection) {
                         setBackground("newSongs");
                         showNewSongLabels();
@@ -923,6 +930,9 @@ int main(int argc, char* argv[]) {
                     }
                     break;
                 case SDLK_g:
+                    if(confirming_song_selection || editing_tracklist) {
+                        break;
+                    }
                     if(in_studio && !checking_gheith && !browsing_new_songs && !viewing_tracklist) {
                         song_active = false;
                         in_studio = false;
@@ -933,7 +943,7 @@ int main(int argc, char* argv[]) {
                     }
                     break;
                 case SDLK_x:
-                    if(confirming_song_selection) {
+                    if(confirming_song_selection || editing_tracklist) {
                         break;
                     }
                     if(!in_studio) {
@@ -953,8 +963,18 @@ int main(int argc, char* argv[]) {
                             viewing_tracklist = false;
                     }
                     break;
+                case SDLK_y:
+                    if(confirming_song_selection) {
+                        editing_tracklist = true;
+                        setBackground("editTracks");
+                        hideNewSongSelectLabel();
+                        showTracklistLabels();
+                    }
+                    break;
                 case SDLK_1:
-                    if(browsing_new_songs) {
+                    if(editing_tracklist) {
+                        std::cout << "changing song 1, " << complete_tracklist[tracklist[0]].title << ", to " << complete_tracklist[selected_new_song].title << std::endl;
+                    } else if(browsing_new_songs) {
                         selected_new_song = randSongs[0];
                         std::cout << "selected option 1: " << complete_tracklist[selected_new_song].title << std::endl;
                         setBackground("confirmAdd");
@@ -964,7 +984,9 @@ int main(int argc, char* argv[]) {
                     }
                     break;
                 case SDLK_2:
-                    if(browsing_new_songs) {
+                    if(editing_tracklist) {
+                        std::cout << "changing song 2, " << complete_tracklist[tracklist[1]].title << ", to " << complete_tracklist[selected_new_song].title << std::endl;
+                    } else if(browsing_new_songs) {
                         selected_new_song = randSongs[1];
                         std::cout << "selected option 2: " << complete_tracklist[selected_new_song].title << std::endl;
                         setBackground("confirmAdd");
@@ -974,13 +996,30 @@ int main(int argc, char* argv[]) {
                     }
                     break;
                 case SDLK_3:
-                    if(browsing_new_songs) {
+                    if(editing_tracklist) {
+                        std::cout << "changing song 3, " << complete_tracklist[tracklist[2]].title << ", to " << complete_tracklist[selected_new_song].title << std::endl;
+                    } else if(browsing_new_songs) {
                         selected_new_song = randSongs[2];
                         std::cout << "selected option 3: " << complete_tracklist[selected_new_song].title << std::endl;
                         setBackground("confirmAdd");
                         hideNewSongLabels();
                         confirming_song_selection = true;
                         showNewSongSelectLabel();
+                    }
+                    break;
+                case SDLK_4:
+                    if(editing_tracklist) {
+                        std::cout << "changing song 4, " << complete_tracklist[tracklist[3]].title << ", to " << complete_tracklist[selected_new_song].title << std::endl;
+                    }
+                    break;
+                case SDLK_5:
+                    if(editing_tracklist) {
+                        std::cout << "changing song 5, " << complete_tracklist[tracklist[4]].title << ", to " << complete_tracklist[selected_new_song].title << std::endl;
+                    }
+                    break;
+                case SDLK_6:
+                    if(editing_tracklist) {
+                        std::cout << "changing song 6, " << complete_tracklist[tracklist[5]].title << ", to " << complete_tracklist[selected_new_song].title << std::endl;
                     }
                     break;
                 default:
