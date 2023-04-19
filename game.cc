@@ -47,6 +47,7 @@ bool game_started = false;
 bool in_studio = true;
 bool song_active = false;
 bool browsing_new_songs = false;
+bool confirming_song_selection = false;
 bool viewing_tracklist = false;
 bool checking_gheith = false;
 
@@ -60,6 +61,10 @@ struct SongData {
     int sample_rate; // 44.1kHz or 48kHz
     int index;
 };
+
+// used for new songs array
+int randSongs[] = { rand()%ALL_TRACKS_SIZE, rand()%ALL_TRACKS_SIZE, rand()%ALL_TRACKS_SIZE };
+
 int tracklist[] = {4, 8, 9, 11, 14, 15};
 std::string static_sounds[] = {"static1", "static2", "static3"};
 std::string ads[] = { "ozempic", "homedepot", "whopper" };
@@ -171,12 +176,19 @@ char newSubtitle3Buf[45] = "blah info new3";
 SDL_Surface *newSubtitle3_surface;
 SDL_Texture *newSubtitle3_texture;
 SDL_Rect newSubtitle3DstRect = {560, 370, 200, 35};
-
 /*
     ==== GAME METHODS ====
     the following methods are used for game mechanics.
     changing scenes, 
 */
+void resizeRect(SDL_Rect &rect, int x, int y, int w, int h) {
+    rect.x = x;
+    rect.y = y;
+    rect.w = w;
+    rect.h = h;
+    //SDL_SetRect(&rect, x, y, w, h);
+}
+
 void createSongArray() {
     /*
         std::string filename;
@@ -250,13 +262,26 @@ void showNewSongLabels() {
     newSubtitle2_texture = SDL_CreateTextureFromSurface(renderer, newSubtitle2_surface);
     newSubtitle3_surface = TTF_RenderText_Solid(prstartk, newSubtitle3Buf, COLOR_DARK_GRAY);
     newSubtitle3_texture = SDL_CreateTextureFromSurface(renderer, newSubtitle3_surface);
+
+    resizeRect(newTitle1DstRect, 47, 315, 175, 50);
+    resizeRect(newTitle2DstRect, 310, 315, 175, 50);
+    resizeRect(newTitle3DstRect, 573, 315, 175, 50);
+    resizeRect(newSubtitle1DstRect, 33, 370, 200, 35);
+    resizeRect(newSubtitle2DstRect, 299, 370, 200, 35);
+    resizeRect(newSubtitle3DstRect, 560, 370, 200, 35);
+
+    // newTitle1DstRect = {47, 315, 175, 50};
+    // newTitle2DstRect = {310, 315, 175, 50};
+    // newTitle3DstRect = {573, 315, 175, 50};
+    // newSubtitle1DstRect = {33, 370, 200, 35};
+    // newSubtitle2DstRect = {299, 370, 200, 35};
+    // newSubtitle3DstRect = {560, 370, 200, 35};
 }
 
 void getNewSongsForLabels() {
     // probably create a bool here to toggle whether or not
     //    new songs should be selected or not...show() doesn't mean regen()!!
     srand((int) time(0));
-    int randSongs[] = { rand()%ALL_TRACKS_SIZE, rand()%ALL_TRACKS_SIZE, rand()%ALL_TRACKS_SIZE };
     bool foundNewSongs = false;
     int numGood = 0;
 
@@ -352,6 +377,12 @@ void hideNewSongLabels() {
         SDL_DestroyTexture(newSubtitle2_texture);
         SDL_FreeSurface(newSubtitle3_surface);
         SDL_DestroyTexture(newSubtitle3_texture);
+        resizeRect(newTitle1DstRect, 0, 0, 0, 0);
+        resizeRect(newTitle2DstRect, 0, 0, 0, 0);
+        resizeRect(newTitle3DstRect, 0, 0, 0, 0);
+        resizeRect(newSubtitle1DstRect, 0, 0, 0, 0);
+        resizeRect(newSubtitle2DstRect, 0, 0, 0, 0);
+        resizeRect(newSubtitle3DstRect, 0, 0, 0, 0);
     }
 }
 
@@ -429,6 +460,12 @@ void genNewSongLabels(std::string title, std::string artist) {
 void genStudioLabels() {
     genNewMoneyLabel();
     genNewSongLabels(complete_tracklist[tracklist[now_playing_index]].title, complete_tracklist[tracklist[now_playing_index]].artist);
+    // resizeRect(moneyDstRect, 617, 32, 150, 30);
+    // resizeRect(songTitleDstRect, 235, 10, 325, 50);
+    resizeRect(moneyDstRect, 617, 32, 150, 30);
+    resizeRect(songTitleDstRect, 235, 10, 325, 50);
+    // moneyDstRect = {617, 32, 150, 30};
+    // songTitleDstRect = {235, 10, 325, 50};
     studioLabelsHidden = false;
 }
 
@@ -437,6 +474,8 @@ void hideStudioLabels() {
         studioLabelsHidden = true;
         hideMoneyLabel();
         hideSongLabel();
+        resizeRect(moneyDstRect, 0, 0, 0, 0);
+        resizeRect(songTitleDstRect, 0, 0, 0, 0);
     }
 }
 
@@ -492,7 +531,7 @@ void playAudio(std::string audioName, int sampleRate, int royalty_cost) {
     // decrease money
     money -= royalty_cost;
     if(in_studio)
-            genNewMoneyLabel();
+        genStudioLabels();
     //std::cout << "-------- song played: paying $" << royalty_cost << " in royalties :( $" << money << std::endl;
     std::cout << "incremented num_tracks_played: " << num_tracks_played << std::endl;
     if(num_tracks_played % 2 == 0 && in_studio) {
@@ -513,7 +552,7 @@ void playAudio(std::string audioName, int sampleRate, int royalty_cost) {
         ads_played++;
         std::cout << "+++++ Ad playing: money added! $" << money << " | New total_ads_played: " << ads_played << std::endl;
         if(in_studio) //leaving this in seems to prevent spam-scenarios where money label might still be active
-            genNewMoneyLabel();
+            genStudioLabels();
     }
 }
 
@@ -668,6 +707,11 @@ int main(int argc, char* argv[]) {
                     }
                     break;
                 case SDLK_n:
+                    if(confirming_song_selection) {
+                        setBackground("newSongs");
+                        showNewSongLabels();
+                        confirming_song_selection = false;
+                    }
                     if(in_studio && !checking_gheith && !browsing_new_songs && !viewing_tracklist) {
                         in_studio = false;
                         browsing_new_songs = true;
@@ -689,12 +733,17 @@ int main(int argc, char* argv[]) {
                     }
                     break;
                 case SDLK_x:
+                    if(confirming_song_selection) {
+                        break;
+                    }
                     if(!in_studio) {
                         song_active = true;
                         in_studio = true;
                         std::cout << "returning to studio..." << std::endl;
+                        hideNewSongLabels();
                         setBackground("studio");
                         genStudioLabels();
+                        hideTracklistLabels();
                         hideNewSongLabels();
                         if(checking_gheith)
                             checking_gheith = false;
@@ -706,17 +755,29 @@ int main(int argc, char* argv[]) {
                     break;
                 case SDLK_1:
                     if(browsing_new_songs) {
-                        std::cout << "selected song 1..." << std::endl;
+                        selected_new_song = randSongs[0];
+                        std::cout << "selected option 1: " << complete_tracklist[selected_new_song].title << std::endl;
+                        setBackground("confirmAdd");
+                        hideNewSongLabels();
+                        confirming_song_selection = true;
                     }
                     break;
                 case SDLK_2:
                     if(browsing_new_songs) {
-                        std::cout << "selected song 2..." << std::endl;
+                        selected_new_song = randSongs[1];
+                        std::cout << "selected option 2: " << complete_tracklist[selected_new_song].title << std::endl;
+                        setBackground("confirmAdd");
+                        hideNewSongLabels();
+                        confirming_song_selection = true;
                     }
                     break;
                 case SDLK_3:
                     if(browsing_new_songs) {
-                        std::cout << "selected song 3..." << std::endl;
+                        selected_new_song = randSongs[2];
+                        std::cout << "selected option 3: " << complete_tracklist[selected_new_song].title << std::endl;
+                        setBackground("confirmAdd");
+                        hideNewSongLabels();
+                        confirming_song_selection = true;
                     }
                     break;
                 default:
