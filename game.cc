@@ -246,8 +246,10 @@ void playAudio(std::string audioName, int sampleRate, int royalty_cost) {
     std::cout << "incremented num_tracks_played: " << num_tracks_played << std::endl;
     if(num_tracks_played % 2 == 0) {
         money += exp_money_increment;
-        playAudio(static_sounds[ads_played%3], 44100, 0);
-        playAudio(ads[ads_played%3], 44100, 0);
+        if(in_studio) {
+            playAudio(static_sounds[ads_played%3], 44100, 0);
+            playAudio(ads[ads_played%3], 44100, 0);
+        }
         ads_played++;
         std::cout << "+++++ Ad playing: money added! $" << money << std::endl;
         if(in_studio)
@@ -400,28 +402,14 @@ int main(int argc, char* argv[]) {
                         genStudioLabels();
                     }
                     break;
-                case SDLK_a:
-                    if(in_studio) {
-                        in_studio = false;
-                        std::cout << "change to ads scene..." << std::endl;
-                        setBackground("ads");
-                    }
-                    break;
-                case SDLK_b:
+                case SDLK_v:
                     if(in_studio) {
                         in_studio = false;
                         std::cout << "change to buy new songs..." << std::endl;
                         setBackground("buy");
                     }
                     break;
-                case SDLK_c:
-                    if(in_studio) {
-                        in_studio = false;
-                        std::cout << "change to check alicefm..." << std::endl;
-                        setBackground("aliceFM");
-                    }
-                    break;
-                case SDLK_e:
+                case SDLK_n:
                     if(in_studio) {
                         in_studio = false;
                         std::cout << "change to edit setlist..." << std::endl;
