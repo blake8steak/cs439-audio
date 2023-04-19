@@ -89,19 +89,19 @@ int lifetime_coolness_points = 0;
 */
 SDL_Surface*  tracklistCover1_surface;
 SDL_Texture* tracklistCover1_texture;
-SDL_Rect tracklistCover1DstRect = {65, 100, 75, 75};
+SDL_Rect tracklistCover1DstRect = {65, 105, 75, 75};
 SDL_Surface*  tracklistCover2_surface;
 SDL_Texture* tracklistCover2_texture;
-SDL_Rect tracklistCover2DstRect = {65, 250, 75, 75};
+SDL_Rect tracklistCover2DstRect = {65, 260, 75, 75};
 SDL_Surface*  tracklistCover3_surface;
 SDL_Texture* tracklistCover3_texture;
 SDL_Rect tracklistCover3DstRect = {65, 415, 75, 75};
 SDL_Surface*  tracklistCover4_surface;
 SDL_Texture* tracklistCover4_texture;
-SDL_Rect tracklistCover4DstRect = {445, 100, 75, 75};
+SDL_Rect tracklistCover4DstRect = {445, 105, 75, 75};
 SDL_Surface*  tracklistCover5_surface;
 SDL_Texture* tracklistCover5_texture;
-SDL_Rect tracklistCover5DstRect = {445, 250, 75, 75};
+SDL_Rect tracklistCover5DstRect = {445, 260, 75, 75};
 SDL_Surface*  tracklistCover6_surface;
 SDL_Texture* tracklistCover6_texture;
 SDL_Rect tracklistCover6DstRect = {445, 415, 75, 75};
@@ -349,11 +349,11 @@ void setTracklistImages() {
     tracklistCover6_surface = IMG_Load(&path6[0]);
     tracklistCover6_texture = SDL_CreateTextureFromSurface(renderer, tracklistCover6_surface);
     std::cout << "---- got 6 done..." << path6 << std::endl;
-    resizeRect(tracklistCover1DstRect, 65, 100, 75, 75);
-    resizeRect(tracklistCover2DstRect, 65, 250, 75, 75);
+    resizeRect(tracklistCover1DstRect, 65, 105, 75, 75);
+    resizeRect(tracklistCover2DstRect, 65, 260, 75, 75);
     resizeRect(tracklistCover3DstRect, 65, 415, 75, 75);
-    resizeRect(tracklistCover4DstRect, 445, 100, 75, 75);
-    resizeRect(tracklistCover5DstRect, 445, 250, 75, 75);
+    resizeRect(tracklistCover4DstRect, 445, 105, 75, 75);
+    resizeRect(tracklistCover5DstRect, 445, 260, 75, 75);
     resizeRect(tracklistCover6DstRect, 445, 415, 75, 75);
     // if (*tracklistCover1_surface == nullptr) {
     //     std::cerr << "image1 IMG_Load Error: " << IMG_GetError() << std::endl;
@@ -857,8 +857,8 @@ void playAudio(std::string audioName, int sampleRate, int royalty_cost) {
         genStudioLabels();
     //std::cout << "-------- song played: paying $" << royalty_cost << " in royalties :( $" << money << std::endl;
     std::cout << "incremented num_tracks_played: " << num_tracks_played << std::endl;
-    if(num_tracks_played % 3 == 0 && in_studio)
-        getNewSongsForLabels();
+    // if(num_tracks_played % 3 == 0 && in_studio)
+    //     getNewSongsForLabels();
     if(num_tracks_played % 2 == 0 && in_studio) {
         money += exp_money_increment;
         // do you want to be able to spam 'g''x''g''x' and make bank??
@@ -873,6 +873,7 @@ void playAudio(std::string audioName, int sampleRate, int royalty_cost) {
             adArtistText = "Ozempic";
         }
         genNewSongLabels("$$ AD", adArtistText+" $$");
+        getNewSongsForLabels();
         playAudio(ads[ads_played%3], 44100, 0);
         ads_played++;
         std::cout << "+++++ Ad playing: money added! $" << money << " | New total_ads_played: " << ads_played << std::endl;
@@ -1158,7 +1159,7 @@ int main(int argc, char* argv[]) {
                 case SDLK_6:
                     if(editing_tracklist) {
                         std::cout << "changing song 6, " << complete_tracklist[tracklist[5]].title << ", to " << complete_tracklist[selected_new_song].title << std::endl;
-                        tracklist[0] = selected_new_song;
+                        tracklist[5] = selected_new_song;
                         handlePostTracklistEdit();
                     }
                     break;
