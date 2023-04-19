@@ -34,6 +34,10 @@ struct AudioData {
 };
 AudioData audioData;
 
+// -- using these to prevent double free() causing segfault
+bool studioLabelsHidden = true;
+bool tracklistLabelsHidden = true;
+bool newSongLabelsHidden = true;
 
 //  === GAME VARS ===
 const int TRACKLIST_SIZE = 6;
@@ -43,6 +47,8 @@ bool game_started = false;
 bool in_studio = true;
 bool song_active = false;
 bool browsing_new_songs = false;
+bool viewing_tracklist = false;
+bool checking_gheith = false;
 
 struct SongData {
     std::string filename;
@@ -56,11 +62,12 @@ struct SongData {
 };
 int tracklist[] = {4, 8, 9, 11, 14, 15};
 std::string static_sounds[] = {"static1", "static2", "static3"};
-std::string ads[] = {"whopper", "ozempic", "homedepot"};
+std::string ads[] = { "ozempic", "homedepot", "whopper" };
 int ads_played = 0;
 SongData complete_tracklist[ALL_TRACKS_SIZE];
 int now_playing_index = tracklist[0];
 int num_tracks_played = 0;
+int selected_new_song = 0;
 
 /*
     game score/achievement level vars
@@ -230,6 +237,7 @@ void appendToBuffer(char buffer[], std::string stringToAdd, int startIndex) {
 }
 
 void showNewSongLabels() {
+    newSongLabelsHidden = false;
     newTitle1_surface = TTF_RenderText_Solid(prstartk, newTitle1Buf, COLOR_DARK_GRAY);
     newTitle1_texture = SDL_CreateTextureFromSurface(renderer, newTitle1_surface);
     newTitle2_surface = TTF_RenderText_Solid(prstartk, newTitle2Buf, COLOR_DARK_GRAY);
@@ -247,6 +255,7 @@ void showNewSongLabels() {
 void getNewSongsForLabels() {
     // probably create a bool here to toggle whether or not
     //    new songs should be selected or not...show() doesn't mean regen()!!
+    srand((int) time(0));
     int randSongs[] = { rand()%ALL_TRACKS_SIZE, rand()%ALL_TRACKS_SIZE, rand()%ALL_TRACKS_SIZE };
     bool foundNewSongs = false;
     int numGood = 0;
@@ -329,45 +338,51 @@ void getNewSongsForLabels() {
 }
 
 void hideNewSongLabels() {
-    SDL_FreeSurface(newTitle1_surface);
-    SDL_DestroyTexture(newTitle1_texture);
-    SDL_FreeSurface(newTitle2_surface);
-    SDL_DestroyTexture(newTitle2_texture);
-    SDL_FreeSurface(newTitle3_surface);
-    SDL_DestroyTexture(newTitle3_texture);
-    SDL_FreeSurface(newSubtitle1_surface);
-    SDL_DestroyTexture(newSubtitle1_texture);
-    SDL_FreeSurface(newSubtitle2_surface);
-    SDL_DestroyTexture(newSubtitle2_texture);
-    SDL_FreeSurface(newSubtitle3_surface);
-    SDL_DestroyTexture(newSubtitle3_texture);
+    if(!newSongLabelsHidden) {
+        newSongLabelsHidden = true;
+        SDL_FreeSurface(newTitle1_surface);
+        SDL_DestroyTexture(newTitle1_texture);
+        SDL_FreeSurface(newTitle2_surface);
+        SDL_DestroyTexture(newTitle2_texture);
+        SDL_FreeSurface(newTitle3_surface);
+        SDL_DestroyTexture(newTitle3_texture);
+        SDL_FreeSurface(newSubtitle1_surface);
+        SDL_DestroyTexture(newSubtitle1_texture);
+        SDL_FreeSurface(newSubtitle2_surface);
+        SDL_DestroyTexture(newSubtitle2_texture);
+        SDL_FreeSurface(newSubtitle3_surface);
+        SDL_DestroyTexture(newSubtitle3_texture);
+    }
 }
 
 void hideTracklistLabels() {
-    SDL_FreeSurface(trackTitle1_surface);
-    SDL_DestroyTexture(trackTitle1_texture);
-    SDL_FreeSurface(trackTitle2_surface);
-    SDL_DestroyTexture(trackTitle2_texture);
-    SDL_FreeSurface(trackTitle3_surface);
-    SDL_DestroyTexture(trackTitle3_texture);
-    SDL_FreeSurface(trackTitle4_surface);
-    SDL_DestroyTexture(trackTitle4_texture);
-    SDL_FreeSurface(trackTitle5_surface);
-    SDL_DestroyTexture(trackTitle5_texture);
-    SDL_FreeSurface(trackTitle6_surface);
-    SDL_DestroyTexture(trackTitle6_texture);
-    SDL_FreeSurface(trackSubtitle1_surface);
-    SDL_DestroyTexture(trackSubtitle1_texture);
-    SDL_FreeSurface(trackSubtitle2_surface);
-    SDL_DestroyTexture(trackSubtitle2_texture);
-    SDL_FreeSurface(trackSubtitle3_surface);
-    SDL_DestroyTexture(trackSubtitle3_texture);
-    SDL_FreeSurface(trackSubtitle4_surface);
-    SDL_DestroyTexture(trackSubtitle4_texture);
-    SDL_FreeSurface(trackSubtitle5_surface);
-    SDL_DestroyTexture(trackSubtitle5_texture);
-    SDL_FreeSurface(trackSubtitle6_surface);
-    SDL_DestroyTexture(trackSubtitle6_texture);
+    if(!tracklistLabelsHidden) {
+        tracklistLabelsHidden = true;
+        SDL_FreeSurface(trackTitle1_surface);
+        SDL_DestroyTexture(trackTitle1_texture);
+        SDL_FreeSurface(trackTitle2_surface);
+        SDL_DestroyTexture(trackTitle2_texture);
+        SDL_FreeSurface(trackTitle3_surface);
+        SDL_DestroyTexture(trackTitle3_texture);
+        SDL_FreeSurface(trackTitle4_surface);
+        SDL_DestroyTexture(trackTitle4_texture);
+        SDL_FreeSurface(trackTitle5_surface);
+        SDL_DestroyTexture(trackTitle5_texture);
+        SDL_FreeSurface(trackTitle6_surface);
+        SDL_DestroyTexture(trackTitle6_texture);
+        SDL_FreeSurface(trackSubtitle1_surface);
+        SDL_DestroyTexture(trackSubtitle1_texture);
+        SDL_FreeSurface(trackSubtitle2_surface);
+        SDL_DestroyTexture(trackSubtitle2_texture);
+        SDL_FreeSurface(trackSubtitle3_surface);
+        SDL_DestroyTexture(trackSubtitle3_texture);
+        SDL_FreeSurface(trackSubtitle4_surface);
+        SDL_DestroyTexture(trackSubtitle4_texture);
+        SDL_FreeSurface(trackSubtitle5_surface);
+        SDL_DestroyTexture(trackSubtitle5_texture);
+        SDL_FreeSurface(trackSubtitle6_surface);
+        SDL_DestroyTexture(trackSubtitle6_texture);
+    }
 }
 
 void hideSongLabel() {
@@ -414,11 +429,15 @@ void genNewSongLabels(std::string title, std::string artist) {
 void genStudioLabels() {
     genNewMoneyLabel();
     genNewSongLabels(complete_tracklist[tracklist[now_playing_index]].title, complete_tracklist[tracklist[now_playing_index]].artist);
+    studioLabelsHidden = false;
 }
 
 void hideStudioLabels() {
-    hideMoneyLabel();
-    hideSongLabel();
+    if(!studioLabelsHidden) {
+        studioLabelsHidden = true;
+        hideMoneyLabel();
+        hideSongLabel();
+    }
 }
 
 void playAudio(std::string audioName, int sampleRate, int royalty_cost) {
@@ -640,31 +659,30 @@ int main(int argc, char* argv[]) {
                     }
                     break;
                 case SDLK_v:
-                    if(in_studio) {
+                    if(in_studio && !checking_gheith && !browsing_new_songs && !viewing_tracklist) {
                         in_studio = false;
+                        viewing_tracklist = true;
                         std::cout << "change to view tracklist..." << std::endl;
                         setBackground("viewTracks");
-                        hideMoneyLabel();
-                        hideSongLabel();
+                        hideStudioLabels();
                     }
                     break;
                 case SDLK_n:
-                    if(in_studio) {
+                    if(in_studio && !checking_gheith && !browsing_new_songs && !viewing_tracklist) {
                         in_studio = false;
+                        browsing_new_songs = true;
                         std::cout << "change to new songs..." << std::endl;
                         setBackground("newSongs");
-                        browsing_new_songs = true;
                         getNewSongsForLabels();
                         showNewSongLabels();
-                        hideMoneyLabel();
-                        hideSongLabel();
+                        hideStudioLabels();
                     }
                     break;
                 case SDLK_g:
-                    if(in_studio) {
+                    if(in_studio && !checking_gheith && !browsing_new_songs && !viewing_tracklist) {
                         song_active = false;
                         in_studio = false;
-                        
+                        checking_gheith = true;
                         std::cout << "change to see gheith..." << std::endl;
                         setBackground("gheith0");
                         hideStudioLabels();
@@ -672,13 +690,18 @@ int main(int argc, char* argv[]) {
                     break;
                 case SDLK_x:
                     if(!in_studio) {
-                        browsing_new_songs = false;
                         song_active = true;
                         in_studio = true;
                         std::cout << "returning to studio..." << std::endl;
                         setBackground("studio");
                         genStudioLabels();
                         hideNewSongLabels();
+                        if(checking_gheith)
+                            checking_gheith = false;
+                        if(browsing_new_songs)
+                            browsing_new_songs = false;
+                        if(viewing_tracklist)
+                            viewing_tracklist = false;
                     }
                     break;
                 case SDLK_1:
