@@ -107,13 +107,13 @@ SDL_Texture* tracklistCover6_texture;
 SDL_Rect tracklistCover6DstRect = {445, 415, 75, 75};
 SDL_Surface*  newSongCover1_surface;
 SDL_Texture* newSongCover1_texture;
-SDL_Rect newSongCover1DstRect = {50, 10, 150, 150};
+SDL_Rect newSongCover1DstRect = {55, 250, 175, 175};
 SDL_Surface*  newSongCover2_surface;
 SDL_Texture* newSongCover2_texture;
-SDL_Rect newSongCover2DstRect = {275, 10, 150, 150};
+SDL_Rect newSongCover2DstRect = {320, 250, 175, 175};
 SDL_Surface*  newSongCover3_surface;
 SDL_Texture* newSongCover3_texture;
-SDL_Rect newSongCover3DstRect = {500, 10, 150, 150};
+SDL_Rect newSongCover3DstRect = {600, 250, 175, 175};
 SDL_Surface*  nowPlayingCover_surface;
 SDL_Texture* nowPlayingCover_texture;
 SDL_Rect nowPlayingCoverDstRect = {400, 100, 150, 150};
@@ -323,6 +323,26 @@ void hideNewSongSelectLabel() {
     resizeRect(newSongSelectDstRect, 0, 0, 0, 0);
 }
 
+void setNewSongAlbumImages() {
+    std::cout << "setting new song album images..." << std::endl;
+    std::string path1 = "images/" + complete_tracklist[randSongs[0]].cover_art + ".png";
+    std::string path2 = "images/" + complete_tracklist[randSongs[1]].cover_art + ".png";
+    std::string path3 = "images/" + complete_tracklist[randSongs[2]].cover_art + ".png";
+    newSongCover1_surface = IMG_Load(&path1[0]);
+    newSongCover1_texture = SDL_CreateTextureFromSurface(renderer, newSongCover1_surface);
+    std::cout << "---- got 1 done..." << path1 <<  std::endl;
+    newSongCover2_surface = IMG_Load(&path2[0]);
+    newSongCover2_texture = SDL_CreateTextureFromSurface(renderer, newSongCover2_surface);
+    std::cout << "---- got 2 done..." << path1 <<  std::endl;
+    newSongCover3_surface = IMG_Load(&path3[0]);
+    newSongCover3_texture = SDL_CreateTextureFromSurface(renderer, newSongCover3_surface);
+    std::cout << "---- got 3 done..." << path1 <<  std::endl;
+
+    resizeRect(newSongCover1DstRect, 50, 120, 175, 175);
+    resizeRect(newSongCover2DstRect, 313, 120, 175, 175);
+    resizeRect(newSongCover3DstRect, 572, 120, 175, 175);
+}
+
 void setTracklistImages() {
     std::cout << "setting tracklist images..." << std::endl;
     std::string path1 = "images/" + complete_tracklist[tracklist[0]].cover_art + ".png";
@@ -504,6 +524,8 @@ void showNewSongLabels() {
     // newRoyalty1DstRect = {33, 435, 200, 20};
     // newRoyalty2DstRect = {299, 435, 200, 20};
     // newRoyalty3DstRect = {560, 435, 200, 20};
+
+    setNewSongAlbumImages();
 }
 
 void getNewSongsForLabels() {
@@ -644,6 +666,12 @@ void hideNewSongLabels() {
         SDL_DestroyTexture(newRoyalty2_texture);
         SDL_FreeSurface(newRoyalty3_surface);
         SDL_DestroyTexture(newRoyalty3_texture);
+        SDL_FreeSurface(newSongCover1_surface);
+        SDL_DestroyTexture(newSongCover1_texture);
+        SDL_FreeSurface(newSongCover2_surface);
+        SDL_DestroyTexture(newSongCover2_texture);
+        SDL_FreeSurface(newSongCover3_surface);
+        SDL_DestroyTexture(newSongCover3_texture);
         resizeRect(newTitle1DstRect, 0, 0, 0, 0);
         resizeRect(newTitle2DstRect, 0, 0, 0, 0);
         resizeRect(newTitle3DstRect, 0, 0, 0, 0);
@@ -653,6 +681,9 @@ void hideNewSongLabels() {
         resizeRect(newRoyalty1DstRect, 0, 0, 0, 0);
         resizeRect(newRoyalty2DstRect, 0, 0, 0, 0);
         resizeRect(newRoyalty3DstRect, 0, 0, 0, 0);
+        resizeRect(newSongCover1DstRect, 0, 0, 0, 0);
+        resizeRect(newSongCover2DstRect, 0, 0, 0, 0);
+        resizeRect(newSongCover3DstRect, 0, 0, 0, 0);
     }
 }
 
@@ -1178,6 +1209,9 @@ int main(int argc, char* argv[]) {
     SDL_RenderCopy(renderer, tracklistCover4_texture, NULL, &tracklistCover4DstRect);
     SDL_RenderCopy(renderer, tracklistCover5_texture, NULL, &tracklistCover5DstRect);
     SDL_RenderCopy(renderer, tracklistCover6_texture, NULL, &tracklistCover6DstRect);
+    SDL_RenderCopy(renderer, newSongCover1_texture, NULL, &newSongCover1DstRect);
+    SDL_RenderCopy(renderer, newSongCover2_texture, NULL, &newSongCover2DstRect);
+    SDL_RenderCopy(renderer, newSongCover3_texture, NULL, &newSongCover3DstRect);
     //labels
     SDL_RenderCopy(renderer, trackTitle1_texture, NULL, &trackTitle1DstRect);
     SDL_RenderCopy(renderer, trackTitle2_texture, NULL, &trackTitle2DstRect);
