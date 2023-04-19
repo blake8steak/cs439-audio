@@ -42,6 +42,7 @@ const int ALL_TRACKS_SIZE = 20;
 bool game_started = false;
 bool in_studio = true;
 bool song_active = false;
+bool browsing_new_songs = false;
 
 struct SongData {
     std::string filename;
@@ -85,6 +86,83 @@ char songTitleBuff[45] = "Title";
 SDL_Surface *song_title_surface;
 SDL_Texture *song_title_texture;
 SDL_Rect songTitleDstRect = {235, 10, 325, 50};
+
+// tracklist screen label stuff
+char trackTitle1Buf[45] = "song1";
+SDL_Surface *trackTitle1_surface;
+SDL_Texture *trackTitle1_texture;
+SDL_Rect trackTitle1DstRect = {50, 100, 120, 35};
+char trackTitle2Buf[45] = "song2";
+SDL_Surface *trackTitle2_surface;
+SDL_Texture *trackTitle2_texture;
+SDL_Rect trackTitle2DstRect = {50, 250, 120, 35};
+char trackTitle3Buf[45] = "song3";
+SDL_Surface *trackTitle3_surface;
+SDL_Texture *trackTitle3_texture;
+SDL_Rect trackTitle3DstRect = {50, 400, 120, 35};
+char trackTitle4Buf[45] = "song4";
+SDL_Surface *trackTitle4_surface;
+SDL_Texture *trackTitle4_texture;
+SDL_Rect trackTitle4DstRect = {550, 100, 120, 35};
+char trackTitle5Buf[45] = "song5";
+SDL_Surface *trackTitle5_surface;
+SDL_Texture *trackTitle5_texture;
+SDL_Rect trackTitle5DstRect = {550, 250, 120, 35};
+char trackTitle6Buf[45] = "song6";
+SDL_Surface *trackTitle6_surface;
+SDL_Texture *trackTitle6_texture;
+SDL_Rect trackTitle6DstRect = {550, 400, 120, 35};
+//  -- tracklist subtitles
+char trackSubtitle1Buf[45] = "blah info track1";
+SDL_Surface *trackSubtitle1_surface;
+SDL_Texture *trackSubtitle1_texture;
+SDL_Rect trackSubtitle1DstRect = {50, 100, 120, 35};
+char trackSubtitle2Buf[45] = "blah info track2";
+SDL_Surface *trackSubtitle2_surface;
+SDL_Texture *trackSubtitle2_texture;
+SDL_Rect trackSubtitle2DstRect = {50, 250, 120, 35};
+char trackSubtitle3Buf[45] = "blah info track3";
+SDL_Surface *trackSubtitle3_surface;
+SDL_Texture *trackSubtitle3_texture;
+SDL_Rect trackSubtitle3DstRect = {50, 400, 120, 35};
+char trackSubtitle4Buf[45] = "blah info track4";
+SDL_Surface *trackSubtitle4_surface;
+SDL_Texture *trackSubtitle4_texture;
+SDL_Rect trackSubtitle4DstRect = {550, 100, 120, 35};
+char trackSubtitle5Buf[45] = "blah info track5";
+SDL_Surface *trackSubtitle5_surface;
+SDL_Texture *trackSubtitle5_texture;
+SDL_Rect trackSubtitle5DstRect = {550, 250, 120, 35};
+char trackSubtitle6Buf[45] = "blah info track6";
+SDL_Surface *trackSubtitle6_surface;
+SDL_Texture *trackSubtitle6_texture;
+SDL_Rect trackSubtitle6DstRect = {550, 400, 120, 35};
+//      --- now, time for the selction screen
+char newTitle1Buf[45] = "new1";
+SDL_Surface *newTitle1_surface;
+SDL_Texture *newTitle1_texture;
+SDL_Rect newTitle1DstRect = {50, 100, 120, 35};
+char newTitle2Buf[45] = "new2";
+SDL_Surface *newTitle2_surface;
+SDL_Texture *newTitle2_texture;
+SDL_Rect newTitle2DstRect = {50, 250, 120, 35};
+char newTitle3Buf[45] = "new3";
+SDL_Surface *newTitle3_surface;
+SDL_Texture *newTitle3_texture;
+SDL_Rect newTitle3DstRect = {50, 250, 120, 35};
+//             -- new subtitles
+char newSubtitle1Buf[45] = "blah info new1";
+SDL_Surface *newSubtitle1_surface;
+SDL_Texture *newSubtitle1_texture;
+SDL_Rect newSubtitle1DstRect = {50, 100, 120, 35};
+char newSubtitle2Buf[45] = "blah info new2";
+SDL_Surface *newSubtitle2_surface;
+SDL_Texture *newSubtitle2_texture;
+SDL_Rect newSubtitle2DstRect = {50, 250, 120, 35};
+char newSubtitle3Buf[45] = "blah info new3";
+SDL_Surface *newSubtitle3_surface;
+SDL_Texture *newSubtitle3_texture;
+SDL_Rect newSubtitle3DstRect = {50, 400, 120, 35};
 
 /*
     ==== GAME METHODS ====
@@ -140,6 +218,155 @@ void setBackground(std::string imgName) {
         SDL_Quit();
         return;
     }
+}
+
+void appendToBuffer(char buffer[], std::string stringToAdd, int startIndex) {
+    int strIndex = 0;
+    for(int i=startIndex; i<startIndex+stringToAdd.length(); i++) {
+        buffer[i] = stringToAdd[strIndex];
+        strIndex++;
+    }
+}
+
+void showNewSongLabels() {
+    newTitle1_surface = TTF_RenderText_Solid(prstartk, newTitle1Buf, COLOR_WHITE);
+    newTitle1_texture = SDL_CreateTextureFromSurface(renderer, newTitle1_surface);
+    newTitle2_surface = TTF_RenderText_Solid(prstartk, newTitle2Buf, COLOR_WHITE);
+    newTitle2_texture = SDL_CreateTextureFromSurface(renderer, newTitle2_surface);
+    newTitle3_surface = TTF_RenderText_Solid(prstartk, newTitle3Buf, COLOR_WHITE);
+    newTitle3_texture = SDL_CreateTextureFromSurface(renderer, newTitle3_surface);
+    newSubtitle1_surface = TTF_RenderText_Solid(prstartk, newSubtitle1Buf, COLOR_WHITE);
+    newSubtitle1_texture = SDL_CreateTextureFromSurface(renderer, newSubtitle1_surface);
+    newSubtitle2_surface = TTF_RenderText_Solid(prstartk, newSubtitle2Buf, COLOR_WHITE);
+    newSubtitle2_texture = SDL_CreateTextureFromSurface(renderer, newSubtitle2_surface);
+    newSubtitle3_surface = TTF_RenderText_Solid(prstartk, newSubtitle3Buf, COLOR_WHITE);
+    newSubtitle3_texture = SDL_CreateTextureFromSurface(renderer, newSubtitle3_surface);
+}
+
+void getNewSongsForLabels() {
+    // probably create a bool here to toggle whether or not
+    //    new songs should be selected or not...show() doesn't mean regen()!!
+    int randSongs[] = { rand()%ALL_TRACKS_SIZE, rand()%ALL_TRACKS_SIZE, rand()%ALL_TRACKS_SIZE };
+    bool foundNewSongs = false;
+    int numGood = 0;
+
+    while(!foundNewSongs) {
+        for(int i=0; i<TRACKLIST_SIZE; i++) {
+            if(tracklist[i] == randSongs[i]) {
+                // not a new song
+                randSongs[i] = rand()%ALL_TRACKS_SIZE;
+                break;
+            }
+        }
+        numGood++;
+        if(numGood == 3) {
+            // found 3 new songs that don't exist in tracklist
+            foundNewSongs = true;
+        }
+    }
+
+    // wipe buffers
+    const int bufLength = 45; //default buffer length I set for both title/subtitle
+    for(int i=0; i<bufLength; i++) {
+        newTitle1Buf[i] = 0;
+        newTitle2Buf[i] = 0;
+        newTitle3Buf[i] = 0;
+        newSubtitle1Buf[i] = 0;
+        newSubtitle2Buf[i] = 0;
+        newSubtitle3Buf[i] = 0;
+    }
+
+    // populate title buffers
+    SongData newSong1 = complete_tracklist[randSongs[0]];
+    SongData newSong2 = complete_tracklist[randSongs[1]];
+    SongData newSong3 = complete_tracklist[randSongs[2]];
+    
+    for(int i=0; i<newSong1.title.length(); i++) {
+        newTitle1Buf[i] = newSong1.title[i];
+    }
+    for(int i=0; i<newSong2.title.length(); i++) {
+        newTitle2Buf[i] = newSong2.title[i];
+    }
+    for(int i=0; i<newSong3.title.length(); i++) {
+        newTitle3Buf[i] = newSong3.title[i];
+    }
+
+    // populate subtitle buffers
+    std::string song1Artist = newSong1.artist;
+    std::string song2Artist = newSong2.artist;
+    std::string song3Artist = newSong3.artist;
+    for(int i=0; i<song1Artist.length(); i++) {
+        newSubtitle1Buf[i] = song1Artist[i];
+    }
+    for(int i=0; i<song2Artist.length(); i++) {
+        newSubtitle2Buf[i] = song2Artist[i];
+    }
+    for(int i=0; i<song3Artist.length(); i++) {
+        newSubtitle3Buf[i] = song3Artist[i];
+    }
+    std::string fourty_four = " | 44.1kHz";
+    std::string fourty_eight = " | 48kHz";
+
+    if(newSong1.sample_rate == 44100) {
+        appendToBuffer(newSubtitle1Buf, fourty_four, song1Artist.length());
+    } else {
+        appendToBuffer(newSubtitle1Buf, fourty_eight, song1Artist.length());
+    }
+    if(newSong2.sample_rate == 44100) {
+        appendToBuffer(newSubtitle2Buf, fourty_four, song2Artist.length());
+    } else {
+        appendToBuffer(newSubtitle2Buf, fourty_eight, song2Artist.length());
+    }
+    if(newSong3.sample_rate == 44100) {
+        appendToBuffer(newSubtitle3Buf, fourty_four, song3Artist.length());
+    } else {
+        appendToBuffer(newSubtitle3Buf, fourty_eight, song3Artist.length());
+    }
+
+    // remember to render the labels after calling this!
+    //     renderNewSongLabels();
+}
+
+void hideNewSongLabels() {
+    SDL_FreeSurface(newTitle1_surface);
+    SDL_DestroyTexture(newTitle1_texture);
+    SDL_FreeSurface(newTitle2_surface);
+    SDL_DestroyTexture(newTitle2_texture);
+    SDL_FreeSurface(newTitle3_surface);
+    SDL_DestroyTexture(newTitle3_texture);
+    SDL_FreeSurface(newSubtitle1_surface);
+    SDL_DestroyTexture(newSubtitle1_texture);
+    SDL_FreeSurface(newSubtitle2_surface);
+    SDL_DestroyTexture(newSubtitle2_texture);
+    SDL_FreeSurface(newSubtitle3_surface);
+    SDL_DestroyTexture(newSubtitle3_texture);
+}
+
+void hideTracklistLabels() {
+    SDL_FreeSurface(trackTitle1_surface);
+    SDL_DestroyTexture(trackTitle1_texture);
+    SDL_FreeSurface(trackTitle2_surface);
+    SDL_DestroyTexture(trackTitle2_texture);
+    SDL_FreeSurface(trackTitle3_surface);
+    SDL_DestroyTexture(trackTitle3_texture);
+    SDL_FreeSurface(trackTitle4_surface);
+    SDL_DestroyTexture(trackTitle4_texture);
+    SDL_FreeSurface(trackTitle5_surface);
+    SDL_DestroyTexture(trackTitle5_texture);
+    SDL_FreeSurface(trackTitle6_surface);
+    SDL_DestroyTexture(trackTitle6_texture);
+    SDL_FreeSurface(trackSubtitle1_surface);
+    SDL_DestroyTexture(trackSubtitle1_texture);
+    SDL_FreeSurface(trackSubtitle2_surface);
+    SDL_DestroyTexture(trackSubtitle2_texture);
+    SDL_FreeSurface(trackSubtitle3_surface);
+    SDL_DestroyTexture(trackSubtitle3_texture);
+    SDL_FreeSurface(trackSubtitle4_surface);
+    SDL_DestroyTexture(trackSubtitle4_texture);
+    SDL_FreeSurface(trackSubtitle5_surface);
+    SDL_DestroyTexture(trackSubtitle5_texture);
+    SDL_FreeSurface(trackSubtitle6_surface);
+    SDL_DestroyTexture(trackSubtitle6_texture);
 }
 
 void hideSongLabel() {
@@ -415,7 +642,9 @@ int main(int argc, char* argv[]) {
                     if(in_studio) {
                         in_studio = false;
                         std::cout << "change to view tracklist..." << std::endl;
-                        setBackground("buy");
+                        setBackground("viewTracks");
+                        hideMoneyLabel();
+                        hideSongLabel();
                     }
                     break;
                 case SDLK_n:
@@ -425,6 +654,7 @@ int main(int argc, char* argv[]) {
                         setBackground("newSongs");
                         hideMoneyLabel();
                         hideSongLabel();
+                        browsing_new_songs = true;
                     }
                     break;
                 case SDLK_g:
@@ -439,11 +669,27 @@ int main(int argc, char* argv[]) {
                     break;
                 case SDLK_x:
                     if(!in_studio) {
+                        browsing_new_songs = false;
                         song_active = true;
                         in_studio = true;
                         std::cout << "returning to studio..." << std::endl;
                         setBackground("studio");
                         genStudioLabels();
+                    }
+                    break;
+                case SDLK_1:
+                    if(browsing_new_songs) {
+                        std::cout << "selected song 1..." << std::endl;
+                    }
+                    break;
+                case SDLK_2:
+                    if(browsing_new_songs) {
+                        std::cout << "selected song 2..." << std::endl;
+                    }
+                    break;
+                case SDLK_3:
+                    if(browsing_new_songs) {
+                        std::cout << "selected song 3..." << std::endl;
                     }
                     break;
                 default:
@@ -454,6 +700,12 @@ int main(int argc, char* argv[]) {
                 break;
         }
     }
+    SDL_RenderCopy(renderer, newTitle1_texture, NULL, &newTitle1DstRect);
+    SDL_RenderCopy(renderer, newTitle2_texture, NULL, &newTitle2DstRect);
+    SDL_RenderCopy(renderer, newTitle3_texture, NULL, &newTitle3DstRect);
+    SDL_RenderCopy(renderer, newSubtitle1_texture, NULL, &newSubtitle1DstRect);
+    SDL_RenderCopy(renderer, newSubtitle2_texture, NULL, &newSubtitle2DstRect);
+    SDL_RenderCopy(renderer, newSubtitle3_texture, NULL, &newSubtitle3DstRect);
     SDL_RenderCopy(renderer, song_title_texture, NULL, &songTitleDstRect);
     SDL_RenderCopy(renderer, money_texture, NULL, &moneyDstRect);
     // update screen
