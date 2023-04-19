@@ -111,52 +111,52 @@ SDL_Rect newSongSelectDstRect = {230, 310, 345, 35};
 char trackTitle1Buf[45] = "song1";
 SDL_Surface *trackTitle1_surface;
 SDL_Texture *trackTitle1_texture;
-SDL_Rect trackTitle1DstRect = {50, 100, 120, 35};
+SDL_Rect trackTitle1DstRect = {50, 115, 215, 35};
 char trackTitle2Buf[45] = "song2";
 SDL_Surface *trackTitle2_surface;
 SDL_Texture *trackTitle2_texture;
-SDL_Rect trackTitle2DstRect = {50, 250, 120, 35};
+SDL_Rect trackTitle2DstRect = {50, 265, 215, 35};
 char trackTitle3Buf[45] = "song3";
 SDL_Surface *trackTitle3_surface;
 SDL_Texture *trackTitle3_texture;
-SDL_Rect trackTitle3DstRect = {50, 400, 120, 35};
+SDL_Rect trackTitle3DstRect = {50, 420, 215, 35};
 char trackTitle4Buf[45] = "song4";
 SDL_Surface *trackTitle4_surface;
 SDL_Texture *trackTitle4_texture;
-SDL_Rect trackTitle4DstRect = {550, 100, 120, 35};
+SDL_Rect trackTitle4DstRect = {525, 115, 215, 35};
 char trackTitle5Buf[45] = "song5";
 SDL_Surface *trackTitle5_surface;
 SDL_Texture *trackTitle5_texture;
-SDL_Rect trackTitle5DstRect = {550, 250, 120, 35};
+SDL_Rect trackTitle5DstRect = {525, 265, 215, 35};
 char trackTitle6Buf[45] = "song6";
 SDL_Surface *trackTitle6_surface;
 SDL_Texture *trackTitle6_texture;
-SDL_Rect trackTitle6DstRect = {550, 400, 120, 35};
+SDL_Rect trackTitle6DstRect = {525, 420, 215, 35};
 //  -- tracklist subtitles
 char trackSubtitle1Buf[45] = "blah info track1";
 SDL_Surface *trackSubtitle1_surface;
 SDL_Texture *trackSubtitle1_texture;
-SDL_Rect trackSubtitle1DstRect = {50, 100, 120, 35};
+SDL_Rect trackSubtitle1DstRect = {50, 150, 175, 20};
 char trackSubtitle2Buf[45] = "blah info track2";
 SDL_Surface *trackSubtitle2_surface;
 SDL_Texture *trackSubtitle2_texture;
-SDL_Rect trackSubtitle2DstRect = {50, 250, 120, 35};
+SDL_Rect trackSubtitle2DstRect = {50, 300, 175, 20};
 char trackSubtitle3Buf[45] = "blah info track3";
 SDL_Surface *trackSubtitle3_surface;
 SDL_Texture *trackSubtitle3_texture;
-SDL_Rect trackSubtitle3DstRect = {50, 400, 120, 35};
+SDL_Rect trackSubtitle3DstRect = {50, 455, 175, 20};
 char trackSubtitle4Buf[45] = "blah info track4";
 SDL_Surface *trackSubtitle4_surface;
 SDL_Texture *trackSubtitle4_texture;
-SDL_Rect trackSubtitle4DstRect = {550, 100, 120, 35};
+SDL_Rect trackSubtitle4DstRect = {525, 150, 175, 20};
 char trackSubtitle5Buf[45] = "blah info track5";
 SDL_Surface *trackSubtitle5_surface;
 SDL_Texture *trackSubtitle5_texture;
-SDL_Rect trackSubtitle5DstRect = {550, 250, 120, 35};
+SDL_Rect trackSubtitle5DstRect = {525, 300, 175, 20};
 char trackSubtitle6Buf[45] = "blah info track6";
 SDL_Surface *trackSubtitle6_surface;
 SDL_Texture *trackSubtitle6_texture;
-SDL_Rect trackSubtitle6DstRect = {550, 400, 120, 35};
+SDL_Rect trackSubtitle6DstRect = {525, 455, 175, 20};
 //      --- now, time for the selction screen
 char newTitle1Buf[45] = "new1";
 SDL_Surface *newTitle1_surface;
@@ -284,6 +284,96 @@ void showNewSongSelectLabel() {
 
 void hideNewSongSelectLabel() {
     resizeRect(newSongSelectDstRect, 0, 0, 0, 0);
+}
+
+void showTracklistLabels() {
+    tracklistLabelsHidden = false;
+    //populate buffers with all data
+    //first, clear buffs
+    const int bufLength = 45; //default buffer length
+    for(int i=0; i<bufLength; i++) {
+        trackTitle1Buf[i] = 0;
+        trackTitle2Buf[i] = 0;
+        trackTitle3Buf[i] = 0;
+        trackTitle4Buf[i] = 0;
+        trackTitle5Buf[i] = 0;
+        trackTitle6Buf[i] = 0;
+        trackSubtitle1Buf[i] = 0;
+        trackSubtitle2Buf[i] = 0;
+        trackSubtitle3Buf[i] = 0;
+        trackSubtitle4Buf[i] = 0;
+        trackSubtitle5Buf[i] = 0;
+        trackSubtitle6Buf[i] = 0;
+    }
+    SongData track1 = complete_tracklist[tracklist[0]];
+    SongData track2 = complete_tracklist[tracklist[1]];
+    SongData track3 = complete_tracklist[tracklist[2]];
+    SongData track4 = complete_tracklist[tracklist[3]];
+    SongData track5 = complete_tracklist[tracklist[4]];
+    SongData track6 = complete_tracklist[tracklist[5]];
+    // push in title data
+    appendToBuffer(trackTitle1Buf, track1.title, 0);
+    appendToBuffer(trackTitle2Buf, track2.title, 0);
+    appendToBuffer(trackTitle3Buf, track3.title, 0);
+    appendToBuffer(trackTitle4Buf, track4.title, 0);
+    appendToBuffer(trackTitle5Buf, track5.title, 0);
+    appendToBuffer(trackTitle6Buf, track6.title, 0);
+    // subtitles
+    appendToBuffer(trackSubtitle1Buf, track1.artist, 0);
+    appendToBuffer(trackSubtitle2Buf, track2.artist, 0);
+    appendToBuffer(trackSubtitle3Buf, track3.artist, 0);
+    appendToBuffer(trackSubtitle4Buf, track4.artist, 0);
+    appendToBuffer(trackSubtitle5Buf, track5.artist, 0);
+    appendToBuffer(trackSubtitle6Buf, track6.artist, 0);
+    appendToBuffer(trackSubtitle1Buf, " | $", track1.artist.length());
+    appendToBuffer(trackSubtitle2Buf, " | $", track2.artist.length());
+    appendToBuffer(trackSubtitle3Buf, " | $", track3.artist.length());
+    appendToBuffer(trackSubtitle4Buf, " | $", track4.artist.length());
+    appendToBuffer(trackSubtitle5Buf, " | $", track5.artist.length());
+    appendToBuffer(trackSubtitle6Buf, " | $", track6.artist.length());
+    appendToBuffer(trackSubtitle1Buf, std::to_string(track1.royalty_cost), track1.artist.length()+4);
+    appendToBuffer(trackSubtitle2Buf, std::to_string(track2.royalty_cost), track2.artist.length()+4);
+    appendToBuffer(trackSubtitle3Buf, std::to_string(track3.royalty_cost), track3.artist.length()+4);
+    appendToBuffer(trackSubtitle4Buf, std::to_string(track4.royalty_cost), track4.artist.length()+4);
+    appendToBuffer(trackSubtitle5Buf, std::to_string(track5.royalty_cost), track5.artist.length()+4);
+    appendToBuffer(trackSubtitle6Buf, std::to_string(track6.royalty_cost), track6.artist.length()+4);
+    // now render the labels!
+    trackTitle1_surface = TTF_RenderText_Solid(prstartk, trackTitle1Buf, COLOR_DARK_GRAY);
+    trackTitle1_texture = SDL_CreateTextureFromSurface(renderer, trackTitle1_surface);
+    trackTitle2_surface = TTF_RenderText_Solid(prstartk, trackTitle2Buf, COLOR_DARK_GRAY);
+    trackTitle2_texture = SDL_CreateTextureFromSurface(renderer, trackTitle2_surface);
+    trackTitle3_surface = TTF_RenderText_Solid(prstartk, trackTitle3Buf, COLOR_DARK_GRAY);
+    trackTitle3_texture = SDL_CreateTextureFromSurface(renderer, trackTitle3_surface);
+    trackTitle4_surface = TTF_RenderText_Solid(prstartk, trackTitle4Buf, COLOR_DARK_GRAY);
+    trackTitle4_texture = SDL_CreateTextureFromSurface(renderer, trackTitle4_surface);
+    trackTitle5_surface = TTF_RenderText_Solid(prstartk, trackTitle5Buf, COLOR_DARK_GRAY);
+    trackTitle5_texture = SDL_CreateTextureFromSurface(renderer, trackTitle5_surface);
+    trackTitle6_surface = TTF_RenderText_Solid(prstartk, trackTitle6Buf, COLOR_DARK_GRAY);
+    trackTitle6_texture = SDL_CreateTextureFromSurface(renderer, trackTitle6_surface);
+    trackSubtitle1_surface = TTF_RenderText_Solid(prstartk, trackSubtitle1Buf, COLOR_DARK_GRAY);
+    trackSubtitle1_texture = SDL_CreateTextureFromSurface(renderer, trackSubtitle1_surface);
+    trackSubtitle2_surface = TTF_RenderText_Solid(prstartk, trackSubtitle2Buf, COLOR_DARK_GRAY);
+    trackSubtitle2_texture = SDL_CreateTextureFromSurface(renderer, trackSubtitle2_surface);
+    trackSubtitle3_surface = TTF_RenderText_Solid(prstartk, trackSubtitle3Buf, COLOR_DARK_GRAY);
+    trackSubtitle3_texture = SDL_CreateTextureFromSurface(renderer, trackSubtitle3_surface);
+    trackSubtitle4_surface = TTF_RenderText_Solid(prstartk, trackSubtitle4Buf, COLOR_DARK_GRAY);
+    trackSubtitle4_texture = SDL_CreateTextureFromSurface(renderer, trackSubtitle4_surface);
+    trackSubtitle5_surface = TTF_RenderText_Solid(prstartk, trackSubtitle5Buf, COLOR_DARK_GRAY);
+    trackSubtitle5_texture = SDL_CreateTextureFromSurface(renderer, trackSubtitle5_surface);
+    trackSubtitle6_surface = TTF_RenderText_Solid(prstartk, trackSubtitle6Buf, COLOR_DARK_GRAY);
+    trackSubtitle6_texture = SDL_CreateTextureFromSurface(renderer, trackSubtitle6_surface);
+    resizeRect(trackTitle1DstRect, 50, 115, 215, 35);
+    resizeRect(trackTitle2DstRect, 50, 265, 215, 35);
+    resizeRect(trackTitle3DstRect, 50, 420, 215, 35);
+    resizeRect(trackTitle4DstRect, 525, 115, 215, 35);
+    resizeRect(trackTitle5DstRect, 525, 265, 215, 35);
+    resizeRect(trackTitle6DstRect, 525, 420, 215, 35);
+    resizeRect(trackSubtitle1DstRect, 50, 150, 175, 25);
+    resizeRect(trackSubtitle2DstRect, 50, 300, 175, 25);
+    resizeRect(trackSubtitle3DstRect, 50, 455, 175, 25);
+    resizeRect(trackSubtitle4DstRect, 525, 150, 175, 25);
+    resizeRect(trackSubtitle5DstRect, 525, 300, 175, 25);
+    resizeRect(trackSubtitle6DstRect, 525, 455, 175, 25);
 }
 
 void showNewSongLabels() {
@@ -505,6 +595,18 @@ void hideTracklistLabels() {
         SDL_DestroyTexture(trackSubtitle5_texture);
         SDL_FreeSurface(trackSubtitle6_surface);
         SDL_DestroyTexture(trackSubtitle6_texture);
+        resizeRect(trackTitle1DstRect, 0, 0, 0, 0);
+        resizeRect(trackTitle2DstRect, 0, 0, 0, 0);
+        resizeRect(trackTitle3DstRect, 0, 0, 0, 0);
+        resizeRect(trackTitle4DstRect, 0, 0, 0, 0);
+        resizeRect(trackTitle5DstRect, 0, 0, 0, 0);
+        resizeRect(trackTitle6DstRect, 0, 0, 0, 0);
+        resizeRect(trackSubtitle1DstRect, 0, 0, 0, 0);
+        resizeRect(trackSubtitle2DstRect, 0, 0, 0, 0);
+        resizeRect(trackSubtitle3DstRect, 0, 0, 0, 0);
+        resizeRect(trackSubtitle4DstRect, 0, 0, 0, 0);
+        resizeRect(trackSubtitle5DstRect, 0, 0, 0, 0);
+        resizeRect(trackSubtitle6DstRect, 0, 0, 0, 0);
     }
 }
 
@@ -800,6 +902,7 @@ int main(int argc, char* argv[]) {
                         viewing_tracklist = true;
                         std::cout << "change to view tracklist..." << std::endl;
                         setBackground("viewTracks");
+                        showTracklistLabels();
                         hideStudioLabels();
                     }
                     break;
@@ -888,6 +991,18 @@ int main(int argc, char* argv[]) {
                 break;
         }
     }
+    SDL_RenderCopy(renderer, trackTitle1_texture, NULL, &trackTitle1DstRect);
+    SDL_RenderCopy(renderer, trackTitle2_texture, NULL, &trackTitle2DstRect);
+    SDL_RenderCopy(renderer, trackTitle3_texture, NULL, &trackTitle3DstRect);
+    SDL_RenderCopy(renderer, trackTitle4_texture, NULL, &trackTitle4DstRect);
+    SDL_RenderCopy(renderer, trackTitle5_texture, NULL, &trackTitle5DstRect);
+    SDL_RenderCopy(renderer, trackTitle6_texture, NULL, &trackTitle6DstRect);
+    SDL_RenderCopy(renderer, trackSubtitle1_texture, NULL, &trackSubtitle1DstRect);
+    SDL_RenderCopy(renderer, trackSubtitle2_texture, NULL, &trackSubtitle2DstRect);
+    SDL_RenderCopy(renderer, trackSubtitle3_texture, NULL, &trackSubtitle3DstRect);
+    SDL_RenderCopy(renderer, trackSubtitle4_texture, NULL, &trackSubtitle4DstRect);
+    SDL_RenderCopy(renderer, trackSubtitle5_texture, NULL, &trackSubtitle5DstRect);
+    SDL_RenderCopy(renderer, trackSubtitle6_texture, NULL, &trackSubtitle6DstRect);
     SDL_RenderCopy(renderer, new_song_select_texture, NULL, &newSongSelectDstRect);
     SDL_RenderCopy(renderer, newTitle1_texture, NULL, &newTitle1DstRect);
     SDL_RenderCopy(renderer, newTitle2_texture, NULL, &newTitle2DstRect);
