@@ -242,17 +242,26 @@ void playAudio(std::string audioName, int sampleRate, int royalty_cost) {
     money -= royalty_cost;
     if(in_studio)
             genNewMoneyLabel();
-    std::cout << "-------- song played: paying $" << royalty_cost << " in royalties :( $" << money << std::endl;
+    //std::cout << "-------- song played: paying $" << royalty_cost << " in royalties :( $" << money << std::endl;
     std::cout << "incremented num_tracks_played: " << num_tracks_played << std::endl;
-    if(num_tracks_played % 2 == 0) {
+    if(num_tracks_played % 2 == 0 && in_studio) {
         money += exp_money_increment;
-        if(in_studio) {
-            playAudio(static_sounds[ads_played%3], 44100, 0);
-            playAudio(ads[ads_played%3], 44100, 0);
+        // do you want to be able to spam 'g''x''g''x' and make bank??
+        // if so, remove the in_studio bool from the above conditional
+        playAudio(static_sounds[num_tracks_played%3], 44100, 0);
+        std::string adArtistText;
+        if(ads[ads_played%3] == "whopper") {
+            adArtistText = "Whopper";
+        } else if (ads[ads_played%3] == "homedepot") {
+            adArtistText = "Home Depot";
+        } else {
+            adArtistText = "Ozempic";
         }
+        genNewSongLabels("$$ AD", adArtistText+" $$");
+        playAudio(ads[ads_played%3], 44100, 0);
         ads_played++;
-        std::cout << "+++++ Ad playing: money added! $" << money << std::endl;
-        if(in_studio)
+        std::cout << "+++++ Ad playing: money added! $" << money << " | New total_ads_played: " << ads_played << std::endl;
+        if(in_studio) //leaving this in seems to prevent spam-scenarios where money label might still be active
             genNewMoneyLabel();
     }
 }
@@ -342,17 +351,12 @@ void playAudioWrapper() {
   while(true) {
 
     if(in_studio) {
-        //playAudio(tracklist[num_tracks_played%TRACKLIST_SIZE]);
         now_playing_index = num_tracks_played%ALL_TRACKS_SIZE;
-        //hideStudioLabels();
         genStudioLabels();
         SongData song = complete_tracklist[now_playing_index];
-        std::cout << "**** now playing: " << song.title << " by "<< song.artist << " | sample rate: " << song.sample_rate << std::endl;
-        
+        std::cout << "**** now playing: " << song.title << " by "<< song.artist << " | sample rate: " << song.sample_rate << std::endl;   
         playAudio(song.filename, song.sample_rate, song.royalty_cost);
-        //std::cout << "**** now playing: " << tracklist[num_tracks_played%TRACKLIST_SIZE] << std::endl;
-        std::string staticSound = "static" + std::to_string((num_tracks_played % 3)+1);
-        playAudio(staticSound, 44100, 0);
+        playAudio(static_sounds[num_tracks_played%3], 44100, 0);
     }
   }
 }
