@@ -100,6 +100,12 @@ SDL_Surface *song_title_surface;
 SDL_Texture *song_title_texture;
 SDL_Rect songTitleDstRect = {235, 10, 325, 50};
 
+// new song select title label
+char newSongSelectBuf[45] = "Title";
+SDL_Surface *new_song_select_surface;
+SDL_Texture *new_song_select_texture;
+SDL_Rect newSongSelectDstRect = {230, 310, 345, 35};
+
 // tracklist screen label stuff
 char trackTitle1Buf[45] = "song1";
 SDL_Surface *trackTitle1_surface;
@@ -246,6 +252,23 @@ void appendToBuffer(char buffer[], std::string stringToAdd, int startIndex) {
         buffer[i] = stringToAdd[strIndex];
         strIndex++;
     }
+}
+
+void showNewSongSelectLabel() {
+    SongData selected = complete_tracklist[selected_new_song];
+    for(int i=0; i<45; i++) {
+        newSongSelectBuf[i] = 0;
+    }
+    appendToBuffer(newSongSelectBuf, selected.title, 0);
+    appendToBuffer(newSongSelectBuf, " - ", selected.title.length());
+    appendToBuffer(newSongSelectBuf, selected.artist, selected.title.length()+3);
+    new_song_select_surface = TTF_RenderText_Solid(prstartk, newSongSelectBuf, COLOR_DARK_GRAY);
+    new_song_select_texture = SDL_CreateTextureFromSurface(renderer, new_song_select_surface);
+    resizeRect(newSongSelectDstRect, 230, 310, 345, 35);
+}
+
+void hideNewSongSelectLabel() {
+    resizeRect(newSongSelectDstRect, 0, 0, 0, 0);
 }
 
 void showNewSongLabels() {
@@ -711,6 +734,7 @@ int main(int argc, char* argv[]) {
                         setBackground("newSongs");
                         showNewSongLabels();
                         confirming_song_selection = false;
+                        hideNewSongSelectLabel();
                     }
                     if(in_studio && !checking_gheith && !browsing_new_songs && !viewing_tracklist) {
                         in_studio = false;
@@ -760,6 +784,7 @@ int main(int argc, char* argv[]) {
                         setBackground("confirmAdd");
                         hideNewSongLabels();
                         confirming_song_selection = true;
+                        showNewSongSelectLabel();
                     }
                     break;
                 case SDLK_2:
@@ -769,6 +794,7 @@ int main(int argc, char* argv[]) {
                         setBackground("confirmAdd");
                         hideNewSongLabels();
                         confirming_song_selection = true;
+                        showNewSongSelectLabel();
                     }
                     break;
                 case SDLK_3:
@@ -778,6 +804,7 @@ int main(int argc, char* argv[]) {
                         setBackground("confirmAdd");
                         hideNewSongLabels();
                         confirming_song_selection = true;
+                        showNewSongSelectLabel();
                     }
                     break;
                 default:
@@ -788,6 +815,7 @@ int main(int argc, char* argv[]) {
                 break;
         }
     }
+    SDL_RenderCopy(renderer, new_song_select_texture, NULL, &newSongSelectDstRect);
     SDL_RenderCopy(renderer, newTitle1_texture, NULL, &newTitle1DstRect);
     SDL_RenderCopy(renderer, newTitle2_texture, NULL, &newTitle2DstRect);
     SDL_RenderCopy(renderer, newTitle3_texture, NULL, &newTitle3DstRect);
