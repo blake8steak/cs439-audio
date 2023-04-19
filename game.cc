@@ -276,6 +276,14 @@ void createSongArray() {
     }
 }
 
+int getTracklistCoolnessScore() {
+    int composite;
+    for(int i=0; i<TRACKLIST_SIZE; i++) {
+        composite += complete_tracklist[tracklist[i]].coolness_score;
+    }
+    return composite;
+}
+
 void setBackground(std::string imgName) {
     std::string path = "images/" + imgName + ".png";
     bgSurface = IMG_Load(&path[0]);
@@ -1098,7 +1106,15 @@ int main(int argc, char* argv[]) {
                         in_studio = false;
                         checking_gheith = true;
                         std::cout << "change to see gheith..." << std::endl;
-                        setBackground("gheith0");
+                        int coolScoreCurrent = getTracklistCoolnessScore();
+                        if(coolScoreCurrent < 50) {
+                            setBackground("gheith_trash");
+                        } else if (coolScoreCurrent < 70) {
+                            setBackground("gheith_mid");
+                        } else {
+                            setBackground("gheith_win");
+                        }
+                        
                         hideStudioLabels();
                     }
                     break;
