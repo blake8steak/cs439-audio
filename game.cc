@@ -52,6 +52,8 @@ bool editing_tracklist = false;
 bool viewing_tracklist = false;
 bool checking_gheith = false;
 
+bool bankrupt = false;
+
 struct SongData {
     std::string filename;
     std::string artist;
@@ -892,6 +894,12 @@ void playAudio(std::string audioName, int sampleRate, int royalty_cost) {
 
     // decrease money
     money -= royalty_cost;
+    if(money <= 0) {
+        bankrupt = true;
+        in_studio = false;
+        setBackground("bankrupt");
+        hideStudioLabels();
+    }
     if(in_studio)
         genStudioLabels();
     //std::cout << "-------- song played: paying $" << royalty_cost << " in royalties :( $" << money << std::endl;
@@ -1066,7 +1074,7 @@ int main(int argc, char* argv[]) {
                     }
                     break;
                 case SDLK_v:
-                    if(confirming_song_selection || editing_tracklist) {
+                    if(confirming_song_selection || editing_tracklist || bankrupt) {
                         break;
                     }
                     if(in_studio && !checking_gheith && !browsing_new_songs && !viewing_tracklist) {
@@ -1079,7 +1087,7 @@ int main(int argc, char* argv[]) {
                     }
                     break;
                 case SDLK_n:
-                    if(confirming_song_selection || editing_tracklist) {
+                    if(confirming_song_selection || editing_tracklist || bankrupt) {
                         break;
                     }
                     if(confirming_song_selection) {
@@ -1098,7 +1106,7 @@ int main(int argc, char* argv[]) {
                     }
                     break;
                 case SDLK_g:
-                    if(confirming_song_selection || editing_tracklist) {
+                    if(confirming_song_selection || editing_tracklist || bankrupt) {
                         break;
                     }
                     if(in_studio && !checking_gheith && !browsing_new_songs && !viewing_tracklist) {
@@ -1119,7 +1127,7 @@ int main(int argc, char* argv[]) {
                     }
                     break;
                 case SDLK_x:
-                    if(confirming_song_selection || editing_tracklist) {
+                    if(confirming_song_selection || editing_tracklist || bankrupt) {
                         break;
                     }
                     if(!in_studio) {
