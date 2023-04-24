@@ -1,4 +1,4 @@
-# Bob-FM: The Game
+# 103.5 Bob-FM: The Game
 For our final CS439 project, my group (me and Trish Truong) created a game from scratch, using nothing but plain C++ and SDL. We called it Bob-FM: The Game; we really enjoyed working on it, and we were happy to see that people seemed to enjoy it when we presented.
 
 To recompile the game, enter the following command:
