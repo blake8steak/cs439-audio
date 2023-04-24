@@ -3,7 +3,7 @@ For our final CS439 project, my group (me and Trish Truong) created a game from 
 
 To recompile the game, enter the following command:
 
-### g++ -o bob-fm game.cc \$(pkg-config --cflags --libs sdl2) $(pkg-config --cflags --libs SDL2_image) \$(pkg-config --cflags --libs SDL2_ttf)
+g++ -o bob-fm game.cc \$(pkg-config --cflags --libs sdl2) \$(pkg-config --cflags --libs SDL2_image) \$(pkg-config --cflags --libs SDL2_ttf)
 
 -----------
 To recompile audio.cc, enter the following command into a terminal:
